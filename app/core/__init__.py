@@ -1,0 +1,1 @@
+\"\"\"Core package.\n\nThis package is reserved for core application functionality such as:\n- Security and authentication\n- Application settings and constants\n- Core business logic\n- Shared utilities\n\nCurrently empty but available for future core functionality.\n\"\"\"\n\n# Core modules will be added here as needed

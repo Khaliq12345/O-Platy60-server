@@ -1,0 +1,1 @@
+\"\"\"Additional API router placeholder.\n\nThis module is reserved for additional API routes that may be added\nin the future. Currently empty but imported by the v1 __init__.py module.\n\"\"\"\n\nfrom fastapi import APIRouter\n\n# Create empty router for future use\nrouter: APIRouter = APIRouter()
