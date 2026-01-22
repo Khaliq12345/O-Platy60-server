@@ -21,13 +21,14 @@ from app.models.purchase import (
 TABLE_NAME: str = "purchases"
 
 
-class PurchaseRepo(SUPABASE):
+class  PurchaseRepo(SUPABASE):
     def __init__(self) -> None:
         super().__init__()
 
     def list_purchases(
         self,
         category_id: str | None = None,
+        created_by: str | None = None,
         limit: int = 20,
         offset: int = 0,
         is_desc: bool = True,
@@ -47,11 +48,13 @@ class PurchaseRepo(SUPABASE):
             .order("created_at", desc=is_desc)
         )
         if category_id:
-            stmt.eq("category_id", category_id)
+            stmt = stmt.eq("category_id", category_id)
+        if created_by:
+            stmt = stmt.eq("created_by", created_by)
         if start_date:
-            stmt.gte("created_at", start_date)
+            stmt = stmt.gte("created_at", start_date)
         if end_date:
-            stmt.lte("created_at", end_date)
+            stmt = stmt.lte("created_at", end_date)
 
         resp = stmt.execute()
 
@@ -72,85 +75,44 @@ class PurchaseRepo(SUPABASE):
             return Purchase.model_validate(data[0])
         return None
 
+    def create_purchase(self, payload: PurchaseCreate) -> Purchase:
+        """Create a new purchase in the database.
 
-#
-#
-# def create_purchase(payload: PurchaseCreate) -> Purchase:
-#     """Create a new purchase in the database.
-#
-#     Args:
-#         payload: Purchase creation data
-#
-#     Returns:
-#         Purchase: The newly created purchase record
-#
-#     Raises:
-#         HTTPException: If referenced category doesn't exist or creation fails
-#     """
-#     client: Client = get_supabase()
-#
-#     # Validate category exists
-#     from app.db.repositories.category_repository import get_category_by_id
-#     get_category_by_id(payload.category_id)  # Will raise if not found
-#
-#     data = serialize_for_supabase(payload.model_dump())
-#     resp = (
-#         client.table(TABLE_NAME)
-#         .insert(data)
-#         .execute()
-#     )
-#     return Purchase.model_validate(resp.data[0])
-#
-#
-# def update_purchase(purchase_id: UUID, payload: PurchaseUpdate) -> Purchase | None:
-#     """Update an existing purchase in the database.
-#
-#     Args:
-#         purchase_id: Unique identifier of the purchase to update
-#         payload: Purchase update data (only non-None fields will be updated)
-#
-#     Returns:
-#         Purchase | None: The updated purchase record, or None if no changes
-#
-#     Raises:
-#         HTTPException: If purchase or referenced category is not found
-#     """
-#     client: Client = get_supabase()
-#     update_data = {k: v for k, v in payload.model_dump(exclude_unset=True).items()}
-#     if not update_data:
-#         return get_purchase_by_id(purchase_id)
-#
-#     # Validate category exists if category_id is being updated
-#     if 'category_id' in update_data and update_data['category_id']:
-#         from app.db.repositories.category_repository import get_category_by_id
-#         get_category_by_id(update_data['category_id'])  # Will raise if not found
-#
-#     update_data = serialize_for_supabase(update_data)
-#
-#     resp = (
-#         client.table(TABLE_NAME)
-#         .update(update_data)
-#         .eq("id", str(purchase_id))
-#         .execute()
-#     )
-#     data = resp.data
-#     if not data:
-#         return None
-#     return Purchase.model_validate(data[0])
-#
-#
-# def delete_purchase(purchase_id: UUID) -> None:
-#     """Delete a purchase from the database.
-#
-#     Args:
-#         purchase_id: Unique identifier of the purchase to delete
-#
-#     Raises:
-#         HTTPException: If deletion fails
-#
-#     Note:
-#         This operation will fail if there are transformations referencing this purchase
-#         due to foreign key constraints.
-#     """
-#     client: Client = get_supabase()
-#     client.table(TABLE_NAME).delete().eq("id", str(purchase_id)).execute()
+        Args:
+            payload: Purchase creation data
+
+        Returns:
+            Purchase: The newly created purchase record
+        """
+        data = serialize_for_supabase(payload.model_dump())
+        resp = self.client.table(TABLE_NAME).insert(data).execute()
+        return Purchase.model_validate(resp.data[0])
+
+    def update_purchase(self, purchase_id: UUID, payload: PurchaseUpdate) -> Purchase | None:
+        """Update an existing purchase in the database.
+
+        Args:
+            purchase_id: Unique identifier of the purchase to update
+            payload: Purchase update data (only non-None fields will be updated)
+
+        Returns:
+            Purchase | None: The updated purchase record, or None if no changes
+        """
+        update_data = {k: v for k, v in payload.model_dump(exclude_unset=True).items()}
+        if not update_data:
+            return self.get_purchase_by_id(str(purchase_id))
+
+        update_data = serialize_for_supabase(update_data)
+        resp = self.client.table(TABLE_NAME).update(update_data).eq("id", str(purchase_id)).execute()
+        data = resp.data
+        if data:
+            return Purchase.model_validate(data[0])
+        return None
+
+    def delete_purchase(self, purchase_id: UUID) -> None:
+        """Delete a purchase from the database.
+
+        Args:
+            purchase_id: Unique identifier of the purchase to delete
+        """
+        self.client.table(TABLE_NAME).delete().eq("id", str(purchase_id)).execute()

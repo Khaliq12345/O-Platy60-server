@@ -1,5 +1,6 @@
 from typing import List
-from app.models.purchase import Purchase, PurchasePayload
+from uuid import UUID
+from app.models.purchase import Purchase, PurchasePayload, PurchaseCreate, PurchaseUpdate
 from app.db.repositories.purchase_repository import PurchaseRepo
 from app.core.exception import DatabaseError, ItemNotFoundError
 
@@ -25,6 +26,7 @@ class PurchaseService:
                 start_date=start_date,
                 end_date=end_date,
                 category_id=payload.category_id,
+                created_by=payload.created_by,
                 limit=payload.limit,
                 is_desc=is_desc,
                 offset=offset,
@@ -43,3 +45,30 @@ class PurchaseService:
         if not purchase:
             raise ItemNotFoundError("get_purchase", purchase_id)
         return purchase
+
+    def create_purchase(self, payload: PurchaseCreate) -> Purchase:
+        """Create a new purchase"""
+        try:
+            purchase = self.repo.create_purchase(payload)
+            return purchase
+        except Exception as e:
+            raise DatabaseError("create_purchase", str(e))
+
+    def update_purchase(self, purchase_id: UUID, payload: PurchaseUpdate) -> Purchase:
+        """Update an existing purchase"""
+        try:
+            purchase = self.repo.update_purchase(purchase_id, payload)
+            if not purchase:
+                raise ItemNotFoundError("update_purchase", str(purchase_id))
+            return purchase
+        except Exception as e:
+            raise DatabaseError("update_purchase", str(e))
+
+    def delete_purchase(self, purchase_id: UUID) -> None:
+        """Delete a purchase"""
+        try:
+            # Check if purchase exists first
+            self.get_purchase(str(purchase_id))
+            self.repo.delete_purchase(purchase_id)
+        except Exception as e:
+            raise DatabaseError("delete_purchase", str(e))

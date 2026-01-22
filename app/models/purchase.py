@@ -7,7 +7,6 @@ food items bought by users with pricing and categorization information.
 from datetime import date, datetime
 from uuid import UUID
 from pydantic import BaseModel, Field
-from decimal import Decimal
 from app.models.shared import FilterPayload
 
 
@@ -15,6 +14,7 @@ class PurchasePayload(FilterPayload):
     """The filters for the purchase table"""
 
     category_id: str | None = None
+    created_by: str | None = None
 
 
 class PurchaseBase(BaseModel):
