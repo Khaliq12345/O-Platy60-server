@@ -1,1 +1,0 @@
-\"\"\"Middleware package.\n\nThis package is reserved for FastAPI middleware components such as:\n- CORS middleware\n- Authentication middleware\n- Request/response logging\n- Rate limiting\n- Error handling middleware\n\nCurrently empty but available for future middleware functionality.\n\"\"\"\n\n# Middleware modules will be added here as needed
