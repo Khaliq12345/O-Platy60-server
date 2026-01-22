@@ -5,7 +5,6 @@ handling all CRUD operations with the Supabase database.
 """
 
 from typing import List
-from uuid import UUID
 from app.db.supabase import SUPABASE
 from app.services.serialization import serialize_for_supabase
 from app.models.category import Category, CategoryCreate, CategoryUpdate
@@ -47,7 +46,7 @@ class CategoryRepo(SUPABASE):
         resp = stmt.execute()
         return [Category.model_validate(row) for row in resp.data]
 
-    def get_category_by_id(self, category_id: UUID) -> Category | None:
+    def get_category_by_id(self, category_id: str) -> Category | None:
         """Retrieve a specific category by its ID.
 
         Args:
@@ -56,7 +55,7 @@ class CategoryRepo(SUPABASE):
         Returns:
             Category | None: The requested category record or None if not found
         """
-        resp = self.client.table(TABLE_NAME).select("*").eq("id", str(category_id)).execute()
+        resp = self.client.table(TABLE_NAME).select("*").eq("id", category_id).execute()
         data = resp.data
         if data:
             return Category.model_validate(data[0])
@@ -75,7 +74,7 @@ class CategoryRepo(SUPABASE):
         resp = self.client.table(TABLE_NAME).insert(data).execute()
         return Category.model_validate(resp.data[0])
 
-    def update_category(self, category_id: UUID, payload: CategoryUpdate) -> Category | None:
+    def update_category(self, category_id: str, payload: CategoryUpdate) -> Category | None:
         """Update an existing category in the database.
 
         Args:
@@ -94,7 +93,7 @@ class CategoryRepo(SUPABASE):
         resp = (
             self.client.table(TABLE_NAME)
             .update(update_data)
-            .eq("id", str(category_id))
+            .eq("id", category_id)
             .execute()
         )
         data = resp.data
@@ -102,7 +101,7 @@ class CategoryRepo(SUPABASE):
             return Category.model_validate(data[0])
         return None
 
-    def delete_category(self, category_id: UUID) -> None:
+    def delete_category(self, category_id: str) -> None:
         """Delete a category from the database.
 
         Args:
@@ -112,4 +111,4 @@ class CategoryRepo(SUPABASE):
             This operation will fail if there are purchases referencing this category
             due to foreign key constraints.
         """
-        self.client.table(TABLE_NAME).delete().eq("id", str(category_id)).execute()
+        self.client.table(TABLE_NAME).delete().eq("id", category_id).execute()

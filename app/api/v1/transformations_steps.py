@@ -5,12 +5,12 @@ including CRUD operations for individual steps within transformation processes.
 """
 
 from typing import List
-from uuid import UUID
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
 
 from app.models.transformation_step import (
     TransformationStep,
     TransformationStepCreate,
+    TransformationStepPayload,
     TransformationStepUpdate,
 )
 from app.api.deps import transformation_step_service_depends
@@ -20,7 +20,7 @@ router: APIRouter = APIRouter(prefix="/v1/transformation-steps", tags=["transfor
 
 
 @router.get("/{transformation_id}/", response_model=List[TransformationStep])
-def get_steps_for_transformation(transformation_step_service: transformation_step_service_depends, transformation_id: UUID) -> List[TransformationStep]:
+def get_steps_for_transformation(transformation_step_service: transformation_step_service_depends, transformation_id: str, payload: TransformationStepPayload = Query()) -> List[TransformationStep]:
     """Retrieve all steps for a specific transformation.
     
     Args:
@@ -29,11 +29,11 @@ def get_steps_for_transformation(transformation_step_service: transformation_ste
     Returns:
         List[TransformationStep]: List of steps ordered by creation time
     """
-    return transformation_step_service.get_steps_by_transformation(transformation_id)
+    return transformation_step_service.get_steps_by_transformation(transformation_id, payload)
 
 
 @router.get("/step/{step_id}", response_model=TransformationStep)
-def get_step(transformation_step_service: transformation_step_service_depends, step_id: UUID) -> TransformationStep:
+def get_step(transformation_step_service: transformation_step_service_depends, step_id: str) -> TransformationStep:
     """Retrieve a specific transformation step by ID.
     
     Args:
@@ -59,7 +59,7 @@ def create_step_endpoint(transformation_step_service: transformation_step_servic
 
 
 @router.put("/{step_id}", response_model=TransformationStep)
-def update_step_endpoint(transformation_step_service: transformation_step_service_depends, step_id: UUID, payload: TransformationStepUpdate) -> TransformationStep:
+def update_step_endpoint(transformation_step_service: transformation_step_service_depends, step_id: str, payload: TransformationStepUpdate) -> TransformationStep:
     """Update an existing transformation step.
     
     Args:
@@ -73,7 +73,7 @@ def update_step_endpoint(transformation_step_service: transformation_step_servic
 
 
 @router.delete("/{step_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_step_endpoint(transformation_step_service: transformation_step_service_depends, step_id: UUID) -> None:
+def delete_step_endpoint(transformation_step_service: transformation_step_service_depends, step_id: str) -> None:
     """Delete a transformation step.
     
     Args:

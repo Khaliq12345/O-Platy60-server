@@ -5,8 +5,6 @@ handling all CRUD operations with the Supabase database.
 """
 
 from typing import List
-from uuid import UUID
-from supabase import Client
 from app.db.supabase import SUPABASE
 from app.services.serialization import serialize_for_supabase
 from app.models.purchase import (
@@ -88,7 +86,7 @@ class  PurchaseRepo(SUPABASE):
         resp = self.client.table(TABLE_NAME).insert(data).execute()
         return Purchase.model_validate(resp.data[0])
 
-    def update_purchase(self, purchase_id: UUID, payload: PurchaseUpdate) -> Purchase | None:
+    def update_purchase(self, purchase_id: str, payload: PurchaseUpdate) -> Purchase | None:
         """Update an existing purchase in the database.
 
         Args:
@@ -100,19 +98,19 @@ class  PurchaseRepo(SUPABASE):
         """
         update_data = {k: v for k, v in payload.model_dump(exclude_unset=True).items()}
         if not update_data:
-            return self.get_purchase_by_id(str(purchase_id))
+            return self.get_purchase_by_id(purchase_id)
 
         update_data = serialize_for_supabase(update_data)
-        resp = self.client.table(TABLE_NAME).update(update_data).eq("id", str(purchase_id)).execute()
+        resp = self.client.table(TABLE_NAME).update(update_data).eq("id", purchase_id).execute()
         data = resp.data
         if data:
             return Purchase.model_validate(data[0])
         return None
 
-    def delete_purchase(self, purchase_id: UUID) -> None:
+    def delete_purchase(self, purchase_id: str) -> None:
         """Delete a purchase from the database.
 
         Args:
             purchase_id: Unique identifier of the purchase to delete
         """
-        self.client.table(TABLE_NAME).delete().eq("id", str(purchase_id)).execute()
+        self.client.table(TABLE_NAME).delete().eq("id", purchase_id).execute()

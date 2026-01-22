@@ -5,7 +5,6 @@ handling all CRUD operations with the Supabase database.
 """
 
 from typing import List
-from uuid import UUID
 from app.db.supabase import SUPABASE
 from app.services.serialization import serialize_for_supabase
 from app.models.transformation_step import (
@@ -25,7 +24,7 @@ class TransformationStepRepo(SUPABASE):
 
     def list_steps_by_transformation(
         self, 
-        transformation_id: UUID,
+        transformation_id: str,
         limit: int = 20,
         offset: int = 0,
         is_desc: bool = False,
@@ -43,7 +42,7 @@ class TransformationStepRepo(SUPABASE):
         stmt = (
             self.client.table(TABLE_NAME)
             .select("*")
-            .eq("transformation_id", str(transformation_id))
+            .eq("transformation_id", transformation_id)
             .limit(limit)
             .offset(offset)
             .order("created_at", desc=is_desc)
@@ -56,7 +55,7 @@ class TransformationStepRepo(SUPABASE):
         resp = stmt.execute()
         return [TransformationStep.model_validate(row) for row in resp.data]
 
-    def get_step_by_id(self, step_id: UUID) -> TransformationStep | None:
+    def get_step_by_id(self, step_id: str) -> TransformationStep | None:
         """Retrieve a specific transformation step by its ID.
 
         Args:
@@ -65,7 +64,7 @@ class TransformationStepRepo(SUPABASE):
         Returns:
             TransformationStep | None: The requested transformation step record or None if not found
         """
-        resp = self.client.table(TABLE_NAME).select("*").eq("id", str(step_id)).execute()
+        resp = self.client.table(TABLE_NAME).select("*").eq("id", step_id).execute()
         data = resp.data
         if data:
             return TransformationStep.model_validate(data[0])
@@ -85,7 +84,7 @@ class TransformationStepRepo(SUPABASE):
         return TransformationStep.model_validate(resp.data[0])
 
     def update_step(
-        self, step_id: UUID, payload: TransformationStepUpdate
+        self, step_id: str, payload: TransformationStepUpdate
     ) -> TransformationStep | None:
         """Update an existing transformation step in the database.
 
@@ -102,16 +101,16 @@ class TransformationStepRepo(SUPABASE):
 
         update_data = serialize_for_supabase(update_data)
 
-        resp = self.client.table(TABLE_NAME).update(update_data).eq("id", str(step_id)).execute()
+        resp = self.client.table(TABLE_NAME).update(update_data).eq("id", step_id).execute()
         data = resp.data
         if data:
             return TransformationStep.model_validate(data[0])
         return None
 
-    def delete_step(self, step_id: UUID) -> None:
+    def delete_step(self, step_id: str) -> None:
         """Delete a transformation step from the database.
 
         Args:
             step_id: Unique identifier of the step to delete
         """
-        self.client.table(TABLE_NAME).delete().eq("id", str(step_id)).execute()
+        self.client.table(TABLE_NAME).delete().eq("id", step_id).execute()

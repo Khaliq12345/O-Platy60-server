@@ -5,8 +5,8 @@ base models, creation/update schemas, and the main category model.
 """
 
 from datetime import datetime
-from uuid import UUID
 from pydantic import BaseModel, Field
+from app.models.shared import FilterPayload
 
 
 class CategoryBase(BaseModel):
@@ -37,6 +37,11 @@ class CategoryUpdate(BaseModel):
     name: str | None = Field(None, description="Updated category name", min_length=1, max_length=100)
 
 
+class CategoryPayload(FilterPayload):
+    """Filters for category list endpoint"""
+    pass
+
+
 class Category(CategoryBase):
     """Complete category model with database fields.
     
@@ -47,7 +52,7 @@ class Category(CategoryBase):
         created_at: Timestamp when category was created
         updated_at: Timestamp when category was last updated
     """
-    id: UUID = Field(..., description="Unique category identifier")
+    id: str = Field(..., description="Unique category identifier")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
 

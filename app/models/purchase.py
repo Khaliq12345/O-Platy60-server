@@ -5,12 +5,11 @@ food items bought by users with pricing and categorization information.
 """
 
 from datetime import date, datetime
-from uuid import UUID
 from pydantic import BaseModel, Field
 from app.models.shared import FilterPayload
 
 
-class PurchasePayload(FilterPayload):
+class  PurchasePayload(FilterPayload):
     """The filters for the purchase table"""
 
     category_id: str | None = None
@@ -41,7 +40,7 @@ class PurchaseBase(BaseModel):
     price_per_unit: float = Field(..., description="Cost per unit", ge=0)
     total_price: float = Field(..., description="Total cost of the purchase", ge=0)
     purchase_date: date = Field(..., description="Date when the item was purchased")
-    category_id: UUID = Field(..., description="Reference to the category")
+    category_id: str = Field(..., description="Reference to the category")
     notes: str | None = Field(None, description="Optional notes", max_length=1000)
 
 
@@ -54,7 +53,7 @@ class PurchaseCreate(PurchaseBase):
         created_by: UUID of the user creating the purchase
     """
 
-    created_by: UUID = Field(..., description="UUID of the user creating the purchase")
+    created_by: str = Field(..., description="ID of the user creating the purchase")
 
 
 class PurchaseUpdate(BaseModel):
@@ -75,7 +74,7 @@ class PurchaseUpdate(BaseModel):
     )
     total_price: float | None = Field(None, description="Updated total price", ge=0)
     purchase_date: date | None = Field(None, description="Updated purchase date")
-    category_id: UUID | None = Field(None, description="Updated category reference")
+    category_id: str | None = Field(None, description="Updated category reference")
     notes: str | None = Field(None, description="Updated notes", max_length=1000)
 
 
@@ -91,9 +90,9 @@ class Purchase(PurchaseBase):
         updated_at: Timestamp when purchase was last updated
     """
 
-    id: UUID = Field(..., description="Unique purchase identifier")
-    created_by: UUID = Field(
-        ..., description="UUID of the user who created the purchase"
+    id: str = Field(..., description="Unique purchase identifier")
+    created_by: str = Field(
+        ..., description="ID of the user who created the purchase"
     )
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")

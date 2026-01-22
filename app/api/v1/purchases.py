@@ -5,7 +5,6 @@ including CRUD operations and business logic for food purchases.
 """
 
 from typing import List
-from uuid import UUID
 from fastapi import APIRouter, Query, status
 
 from app.models.purchase import (
@@ -57,7 +56,7 @@ def create_purchase_endpoint(purchase_service: purchase_service_depends, payload
 
 
 @router.put("/{purchase_id}", response_model=Purchase)
-def update_purchase_endpoint(purchase_service: purchase_service_depends, purchase_id: UUID, payload: PurchaseUpdate) -> Purchase:
+def update_purchase_endpoint(purchase_service: purchase_service_depends, purchase_id: str, payload: PurchaseUpdate) -> Purchase:
     """Update an existing purchase.
 
     Args:
@@ -71,7 +70,7 @@ def update_purchase_endpoint(purchase_service: purchase_service_depends, purchas
 
 
 @router.delete("/{purchase_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_purchase_endpoint(purchase_service: purchase_service_depends, purchase_id: UUID) -> None:
+def delete_purchase_endpoint(purchase_service: purchase_service_depends, purchase_id: str) -> None:
     """Delete a purchase.
 
     Args:

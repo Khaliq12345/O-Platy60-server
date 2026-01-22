@@ -5,8 +5,13 @@ the process of converting purchased items into prepared food items.
 """
 
 from datetime import datetime
-from uuid import UUID
 from pydantic import BaseModel, Field
+from app.models.shared import FilterPayload
+
+
+class TransformationPayload(FilterPayload):
+    """Filters for transformation list endpoint"""
+    purchase_id: str | None = None
 
 
 class TransformationBase(BaseModel):
@@ -19,7 +24,7 @@ class TransformationBase(BaseModel):
         transformed_at: When the transformation was performed
     """
     name: str = Field(..., description="Name of the transformation process", min_length=1, max_length=200)
-    purchase_id: UUID = Field(..., description="Reference to the purchase being transformed")
+    purchase_id: str = Field(..., description="Reference to the purchase being transformed")
     output_quantity: float = Field(..., description="Amount produced after transformation", gt=0)
     transformed_at: datetime = Field(..., description="When the transformation was performed")
 
@@ -38,7 +43,7 @@ class TransformationUpdate(BaseModel):
     All fields are optional to allow partial updates.
     """
     name: str | None = Field(None, description="Updated transformation name", min_length=1, max_length=200)
-    purchase_id: UUID | None = Field(None, description="Updated purchase reference")
+    purchase_id: str | None = Field(None, description="Updated purchase reference")
     output_quantity: float | None = Field(None, description="Updated output quantity", gt=0)
     transformed_at: datetime | None = Field(None, description="Updated transformation timestamp")
 
@@ -52,7 +57,7 @@ class Transformation(TransformationBase):
         id: Unique transformation identifier
         created_at: Timestamp when transformation record was created
     """
-    id: UUID = Field(..., description="Unique transformation identifier")
+    id: str = Field(..., description="Unique transformation identifier")
     created_at: datetime = Field(..., description="Creation timestamp")
 
     class Config:
