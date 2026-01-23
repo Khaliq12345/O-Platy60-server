@@ -5,9 +5,9 @@ user roles, authentication, and profile information.
 """
 
 from datetime import datetime
-from uuid import UUID
 from enum import Enum
 from pydantic import BaseModel, EmailStr, Field
+from app.models.shared import FilterPayload
 
 
 class UserRole(str, Enum):
@@ -21,6 +21,11 @@ class UserRole(str, Enum):
     manager = "manager"
     cook = "cook"
     admin = "admin"
+
+
+class UserPayload(FilterPayload):
+    """Filters for user list endpoint"""
+    pass
 
 
 class UserBase(BaseModel):
@@ -64,7 +69,7 @@ class User(UserBase):
         created_at: Timestamp when user was created
         updated_at: Timestamp when user was last updated
     """
-    id: UUID = Field(..., description="Unique user identifier")
+    id: str = Field(..., description="Unique user identifier")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
 

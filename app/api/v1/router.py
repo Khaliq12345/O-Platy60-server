@@ -10,6 +10,7 @@ from app.api.v1 import (
     purchases,
     transformations,
     transformations_steps,
+    users,
 )
 
 # Create main API router
@@ -20,4 +21,5 @@ api_router.include_router(categories.router)
 api_router.include_router(purchases.router)
 api_router.include_router(transformations.router)
 api_router.include_router(transformations_steps.router)
+api_router.include_router(users.router)
 
