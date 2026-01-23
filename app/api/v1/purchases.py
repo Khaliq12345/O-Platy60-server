@@ -69,7 +69,7 @@ def update_purchase_endpoint(purchase_service: purchase_service_depends, purchas
     return purchase_service.update_purchase(purchase_id, payload)
 
 
-@router.delete("/{purchase_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{purchase_id}")
 def delete_purchase_endpoint(purchase_service: purchase_service_depends, purchase_id: str) -> None:
     """Delete a purchase.
 

@@ -9,7 +9,7 @@ class CategoryService:
         self.repo = CategoryRepo()
 
     def get_categories(self, payload: CategoryPayload) -> List[Category]:
-        """Get all categories"""
+        """Get all categories with filters"""
         try:
             start_date = payload.start_date.isoformat() if payload.start_date else None
             end_date = payload.end_date.isoformat() if payload.end_date else None
@@ -59,7 +59,6 @@ class CategoryService:
     def delete_category(self, category_id: str) -> None:
         """Delete a category"""
         try:
-            # Check if category exists first
             self.get_category(category_id)
             self.repo.delete_category(category_id)
         except Exception as e:

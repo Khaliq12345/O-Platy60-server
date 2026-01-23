@@ -26,3 +26,12 @@ class DatabaseError(BusinessError):
 
     def __str__(self):
         return f"Function -> {self.name} | There's an error with database - {self.exception}"
+
+class ValidationError(BusinessError):
+    def __init__(self, name: str, message: str) -> None:
+        super().__init__()
+        self.name = name
+        self.message = message
+
+    def __str__(self):
+        return f"Function -> {self.name} | Validation error - {self.message}"
