@@ -42,14 +42,14 @@ class TransformationRepo(SUPABASE):
             .select("*")
             .limit(limit)
             .offset(offset)
-            .order("transformed_at", desc=is_desc)
+            .order("transformation_date", desc=is_desc)
         )
         if purchase_id:
             stmt = stmt.eq("purchase_id", purchase_id)
         if start_date:
-            stmt = stmt.gte("transformed_at", start_date)
+            stmt = stmt.gte("transformation_date", start_date)
         if end_date:
-            stmt = stmt.lte("transformed_at", end_date)
+            stmt = stmt.lte("transformation_date", end_date)
 
         resp = stmt.execute()
         return [Transformation.model_validate(row) for row in resp.data]
@@ -72,17 +72,7 @@ class TransformationRepo(SUPABASE):
         return None
 
     def create_transformation(self, payload: TransformationCreate) -> Transformation:
-        """Create a new transformation in the database.
-
-        Args:
-            payload: Transformation creation data
-
-        Returns:
-            Transformation: The newly created transformation record
-
-        Note:
-            The purchase_id should reference an existing purchase record.
-        """
+        """Create a new transformation in the database."""
         data = serialize_for_supabase(payload.model_dump())
         resp = self.client.table(TABLE_NAME).insert(data).execute()
         return Transformation.model_validate(resp.data[0])

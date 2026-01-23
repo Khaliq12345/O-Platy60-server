@@ -1,7 +1,7 @@
 from typing import List
 from app.models.purchase import Purchase, PurchasePayload, PurchaseCreate, PurchaseUpdate
 from app.db.repositories.purchase_repository import PurchaseRepo
-from app.core.exception import DatabaseError, ItemNotFoundError
+from app.core.exception import DatabaseError, ItemNotFoundError, ValidationError
 
 
 class PurchaseService:
@@ -47,6 +47,9 @@ class PurchaseService:
 
     def create_purchase(self, payload: PurchaseCreate) -> Purchase:
         """Create a new purchase"""
+        if payload.quantity * payload.price_per_unit != payload.total_price:
+            raise ValidationError("create_purchase", "total_price must be equal to quantity * price_per_unit")
+        
         try:
             purchase = self.repo.create_purchase(payload)
             return purchase

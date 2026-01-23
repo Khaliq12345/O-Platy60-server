@@ -1,15 +1,16 @@
 from typing import List
-from app.models.transformation_step import TransformationStep, TransformationStepCreate, TransformationStepUpdate, TransformationStepPayload
+
 from app.db.repositories.transformation_step_repository import TransformationStepRepo
 from app.core.exception import DatabaseError, ItemNotFoundError
-
+from app.models.transformation_step import TransformationStep, TransformationStepCreate, TransformationStepUpdate, TransformationStepPayload
+from app.services.transformation_service import TransformationService
 
 class TransformationStepService:
     def __init__(self) -> None:
         self.repo = TransformationStepRepo()
 
     def get_steps_by_transformation(self, transformation_id: str, payload: TransformationStepPayload) -> List[TransformationStep]:
-        """Get all transformation steps for a specific transformation"""
+        """Get all transformation steps for a specific transformation with filters"""
         try:
             start_date = payload.start_date.isoformat() if payload.start_date else None
             end_date = payload.end_date.isoformat() if payload.end_date else None
@@ -41,6 +42,10 @@ class TransformationStepService:
 
     def create_step(self, payload: TransformationStepCreate) -> TransformationStep:
         """Create a new transformation step"""
+
+        # Verify that the transformation exists
+        TransformationService().get_transformation(payload.transformation_id)
+        
         try:
             step = self.repo.create_step(payload)
             return step
@@ -60,7 +65,6 @@ class TransformationStepService:
     def delete_step(self, step_id: str) -> None:
         """Delete a transformation step"""
         try:
-            # Check if step exists first
             self.get_step(step_id)
             self.repo.delete_step(step_id)
         except Exception as e:

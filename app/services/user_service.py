@@ -1,5 +1,4 @@
 from typing import List
-from uuid import UUID
 from app.models.users import User, UserCreate, UserUpdate
 from app.db.repositories.users_repository import UserRepo
 from app.core.exception import DatabaseError, ItemNotFoundError
@@ -17,7 +16,7 @@ class UserService:
         except Exception as e:
             raise DatabaseError("get_users", str(e))
 
-    def get_user(self, user_id: UUID) -> User:
+    def get_user(self, user_id: str) -> User:
         """Get a single user"""
         user = None
         try:
@@ -25,7 +24,7 @@ class UserService:
         except Exception as e:
             raise DatabaseError("get_user", str(e))
         if not user:
-            raise ItemNotFoundError("get_user", str(user_id))
+            raise ItemNotFoundError("get_user", user_id)
         return user
 
     def create_user(self, payload: UserCreate) -> User:
@@ -36,17 +35,17 @@ class UserService:
         except Exception as e:
             raise DatabaseError("create_user", str(e))
 
-    def update_user(self, user_id: UUID, payload: UserUpdate) -> User:
+    def update_user(self, user_id: str, payload: UserUpdate) -> User:
         """Update an existing user"""
         try:
             user = self.repo.update_user(user_id, payload)
             if not user:
-                raise ItemNotFoundError("update_user", str(user_id))
+                raise ItemNotFoundError("update_user", user_id)
             return user
         except Exception as e:
             raise DatabaseError("update_user", str(e))
 
-    def delete_user(self, user_id: UUID) -> None:
+    def delete_user(self, user_id: str) -> None:
         """Delete a user"""
         try:
             # Check if user exists first
