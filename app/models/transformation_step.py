@@ -13,7 +13,7 @@ class TransformationStepBase(BaseModel):
     transformation_id: str
     step_name: str
     portions: int
-    quantity: int
+    quantity: int | float
 
 
 class TransformationStepCreate(TransformationStepBase):
@@ -24,7 +24,7 @@ class TransformationStepUpdate(BaseModel):
     transformation_id: str | None = None
     step_name: str | None = None
     portions: int | None = None
-    quantity: int | None = None
+    quantity: int | float | None = None
 
 
 class TransformationStep(TransformationStepBase):
@@ -33,3 +33,4 @@ class TransformationStep(TransformationStepBase):
 
     class Config:
         from_attributes = True
+

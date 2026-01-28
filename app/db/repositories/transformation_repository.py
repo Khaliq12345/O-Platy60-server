@@ -5,7 +5,6 @@ handling all CRUD operations with the Supabase database.
 """
 
 from typing import List
-from uuid import UUID
 from app.db.supabase import SUPABASE
 from app.services.serialization import serialize_for_supabase
 from app.models.transformation import (
@@ -54,7 +53,7 @@ class TransformationRepo(SUPABASE):
         resp = stmt.execute()
         return [Transformation.model_validate(row) for row in resp.data]
 
-    def get_transformation_by_id(self, transformation_id: UUID) -> Transformation | None:
+    def get_transformation_by_id(self, transformation_id: str) -> Transformation | None:
         """Retrieve a specific transformation by its ID.
 
         Args:
@@ -64,7 +63,30 @@ class TransformationRepo(SUPABASE):
             Transformation | None: The requested transformation record or None if not found
         """
         resp = (
-            self.client.table(TABLE_NAME).select("*").eq("id", str(transformation_id)).execute()
+            self.client.table(TABLE_NAME)
+            .select("*")
+            .eq("id", str(transformation_id))
+            .execute()
+        )
+        data = resp.data
+        if data:
+            return Transformation.model_validate(data[0])
+        return None
+
+    def get_transformation_by_purchase(self, purchase_id: str) -> Transformation | None:
+        """Retrieve a specific transformation by its purchase.
+
+        Args:
+            purchase_id: Unique identifier of the purchase
+
+        Returns:
+            Transformation | None: The requested transformation record or None if not found
+        """
+        resp = (
+            self.client.table(TABLE_NAME)
+            .select("*")
+            .eq("purchase_id", str(purchase_id))
+            .execute()
         )
         data = resp.data
         if data:
@@ -78,7 +100,7 @@ class TransformationRepo(SUPABASE):
         return Transformation.model_validate(resp.data[0])
 
     def update_transformation(
-        self, transformation_id: UUID, payload: TransformationUpdate
+        self, transformation_id: str, payload: TransformationUpdate
     ) -> Transformation | None:
         """Update an existing transformation in the database.
 
@@ -106,7 +128,7 @@ class TransformationRepo(SUPABASE):
             return Transformation.model_validate(data[0])
         return None
 
-    def delete_transformation(self, transformation_id: UUID) -> None:
+    def delete_transformation(self, transformation_id: str) -> None:
         """Delete a transformation from the database.
 
         Args:
@@ -116,4 +138,6 @@ class TransformationRepo(SUPABASE):
             This operation will also delete all associated transformation steps
             due to cascade delete constraints.
         """
-        self.client.table(TABLE_NAME).delete().eq("id", str(transformation_id)).execute()
+        self.client.table(TABLE_NAME).delete().eq(
+            "id", str(transformation_id)
+        ).execute()
