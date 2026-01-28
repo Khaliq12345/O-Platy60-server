@@ -7,6 +7,7 @@ from app.models.transformation import (
     Transformation,
     TransformationCreate,
     TransformationUpdate,
+    TransformationSummary,
 )
 from app.api.deps import transformation_service_depends
 
@@ -24,6 +25,14 @@ def get_transformations(transformation_service: transformation_service_depends) 
 def get_transformation(transformation_service: transformation_service_depends, transformation_id: str) -> Transformation:
     """Retrieve a specific transformation by ID."""
     return transformation_service.get_transformation(transformation_id)
+
+
+@router.get("/{transformation_id}/summary", response_model=TransformationSummary)
+def get_transformation_summary(
+    transformation_service: transformation_service_depends, transformation_id: str
+) -> TransformationSummary:
+    """Retrieve transformation summary with step calculations."""
+    return transformation_service.transformation_summary(transformation_id)
 
 
 @router.post("/", response_model=Transformation, status_code=status.HTTP_201_CREATED)

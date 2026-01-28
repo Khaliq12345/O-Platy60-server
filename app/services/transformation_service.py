@@ -1,12 +1,14 @@
 from typing import List
 from app.db.repositories.transformation_repository import TransformationRepo
+from app.db.repositories.transformation_step_repository import TransformationStepRepo
 from app.core.exception import DatabaseError, ItemNotFoundError
-from app.models.transformation import Transformation, TransformationCreate, TransformationUpdate
+from app.models.transformation import Transformation, TransformationCreate, TransformationUpdate, TransformationSummary
 from app.services.purchase_service import PurchaseService
 
 class TransformationService:
     def __init__(self) -> None:
         self.repo = TransformationRepo()
+        self.step_repo = TransformationStepRepo()
 
     def get_transformations(self) -> List[Transformation]:
         """Get all transformations"""
@@ -57,3 +59,29 @@ class TransformationService:
             self.repo.delete_transformation(transformation_id)
         except Exception as e:
             raise DatabaseError("delete_transformation", str(e))
+
+    def transformation_summary(self, transformation_id: str) -> TransformationSummary:
+        """Get transformation summary with step calculations"""
+        try:
+            # Get the transformation
+            transformation = self.get_transformation(transformation_id)
+            
+            # Get all steps for this transformation
+            steps = self.step_repo.list_steps_by_transformation(transformation_id)
+            
+            # Calculate totals from steps
+            total_portions = sum(step.portions for step in steps)
+            total_step_quantity = sum(step.quantity for step in steps)
+            step_count = len(steps)
+            remaining_quantity = transformation.quantity_usable - total_step_quantity
+            
+            # Create summary with calculated values
+            return TransformationSummary(
+                **transformation.model_dump(),
+                total_portions=total_portions,
+                total_step_quantity=total_step_quantity,
+                step_count=step_count,
+                remaining_quantity=remaining_quantity
+            )
+        except Exception as e:
+            raise DatabaseError("transformation_summary", str(e))

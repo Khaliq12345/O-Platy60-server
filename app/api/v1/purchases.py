@@ -12,6 +12,7 @@ from app.models.purchase import (
     PurchaseCreate,
     PurchasePayload,
     PurchaseUpdate,
+    PurchaseSummary,
 )
 from app.api.deps import purchase_service_depends
 
@@ -40,6 +41,21 @@ def get_purchase(
         Purchase: The requested purchase record
     """
     return purchase_service.get_purchase(purchase_id)
+
+
+@router.get("/{purchase_id}/summary", response_model=PurchaseSummary)
+def get_purchase_summary(
+    purchase_service: purchase_service_depends, purchase_id: str
+) -> PurchaseSummary:
+    """Retrieve purchase summary with transformation calculations.
+
+    Args:
+        purchase_id: Unique identifier of the purchase
+
+    Returns:
+        PurchaseSummary: Purchase with calculated transformation data
+    """
+    return purchase_service.purchase_summary(purchase_id)
 
 
 @router.post("/", response_model=Purchase, status_code=status.HTTP_201_CREATED)

@@ -40,3 +40,10 @@ class Transformation(TransformationBase):
 
     class Config:
         from_attributes = True
+
+
+class TransformationSummary(Transformation):
+    total_portions: int
+    total_step_quantity: int
+    step_count: int
+    remaining_quantity: float
