@@ -14,6 +14,11 @@ class TransformationBase(BaseModel):
     notes: str | None = None
     cook_signature: str | None = None
     manager_signature: str | None = None
+    total_quantity_used: float | None = None
+    remaining_quantity: float | None = None
+    total_portions: int | None = None
+    total_wastes: float | None = None
+    unit: str
 
 
 class TransformationCreate(TransformationBase):
@@ -47,3 +52,4 @@ class TransformationSummary(Transformation):
     total_step_quantity: int
     step_count: int
     remaining_quantity: float
+

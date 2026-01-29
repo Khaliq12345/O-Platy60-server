@@ -67,8 +67,9 @@ class  PurchaseRepo(SUPABASE):
         Returns:
             Purchase: The requested purchase record
         """
-        resp = self.client.table(TABLE_NAME).select("*").eq("id", purchase_id).execute()
+        resp = self.client.table(TABLE_NAME).select("*, transformations(*)").eq("id", purchase_id).execute()
         data = resp.data
+        print(data)
         if data:
             return Purchase.model_validate(data[0])
         return None

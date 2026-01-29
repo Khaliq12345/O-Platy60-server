@@ -3,6 +3,8 @@
 from datetime import date, datetime
 from pydantic import BaseModel
 from app.models.shared import FilterPayload
+from app.models.transformation import Transformation
+from typing import List
 
 
 class PurchasePayload(FilterPayload):
@@ -42,6 +44,7 @@ class Purchase(PurchaseBase):
     created_by: str
     created_at: datetime
     updated_at: datetime
+    transformations: List[Transformation]
 
     class Config:
         from_attributes = True
@@ -51,3 +54,4 @@ class PurchaseSummary(Purchase):
     total_received_quantity: float
     total_used_quantity: float
     remaining_quantity: float
+
