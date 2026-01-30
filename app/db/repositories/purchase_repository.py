@@ -19,7 +19,7 @@ from app.models.purchase import (
 TABLE_NAME: str = "purchases"
 
 
-class  PurchaseRepo(SUPABASE):
+class PurchaseRepo(SUPABASE):
     def __init__(self) -> None:
         super().__init__()
 
@@ -67,7 +67,12 @@ class  PurchaseRepo(SUPABASE):
         Returns:
             Purchase: The requested purchase record
         """
-        resp = self.client.table(TABLE_NAME).select("*, transformations(*)").eq("id", purchase_id).execute()
+        resp = (
+            self.client.table(TABLE_NAME)
+            .select("*, transformations(*)")
+            .eq("id", purchase_id)
+            .execute()
+        )
         data = resp.data
         print(data)
         if data:
@@ -84,10 +89,13 @@ class  PurchaseRepo(SUPABASE):
             Purchase: The newly created purchase record
         """
         data = serialize_for_supabase(payload.model_dump())
+        print(data)
         resp = self.client.table(TABLE_NAME).insert(data).execute()
         return Purchase.model_validate(resp.data[0])
 
-    def update_purchase(self, purchase_id: str, payload: PurchaseUpdate) -> Purchase | None:
+    def update_purchase(
+        self, purchase_id: str, payload: PurchaseUpdate
+    ) -> Purchase | None:
         """Update an existing purchase in the database.
 
         Args:
@@ -102,7 +110,12 @@ class  PurchaseRepo(SUPABASE):
             return self.get_purchase_by_id(purchase_id)
 
         update_data = serialize_for_supabase(update_data)
-        resp = self.client.table(TABLE_NAME).update(update_data).eq("id", purchase_id).execute()
+        resp = (
+            self.client.table(TABLE_NAME)
+            .update(update_data)
+            .eq("id", purchase_id)
+            .execute()
+        )
         data = resp.data
         if data:
             return Purchase.model_validate(data[0])

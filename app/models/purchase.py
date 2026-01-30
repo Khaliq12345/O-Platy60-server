@@ -44,7 +44,7 @@ class Purchase(PurchaseBase):
     created_by: str
     created_at: datetime
     updated_at: datetime
-    transformations: List[Transformation]
+    transformations: List[Transformation] | None = None
 
     class Config:
         from_attributes = True
@@ -54,4 +54,3 @@ class PurchaseSummary(Purchase):
     total_received_quantity: float
     total_used_quantity: float
     remaining_quantity: float
-
