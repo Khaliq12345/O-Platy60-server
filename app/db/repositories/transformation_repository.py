@@ -24,7 +24,7 @@ class TransformationRepo(SUPABASE):
 
     def list_transformations(
         self,
-        purchase_id: str | None = None,
+        search: str | None = None,
         limit: int = 20,
         offset: int = 0,
         is_desc: bool = True,
@@ -43,8 +43,8 @@ class TransformationRepo(SUPABASE):
             .offset(offset)
             .order("transformation_date", desc=is_desc)
         )
-        if purchase_id:
-            stmt = stmt.eq("purchase_id", purchase_id)
+        if search:
+            stmt = stmt.ilike("product_name", f"%{search}%")
         if start_date:
             stmt = stmt.gte("transformation_date", start_date)
         if end_date:

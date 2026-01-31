@@ -5,6 +5,7 @@ from app.core.exception import DatabaseError, ItemNotFoundError
 from app.models.transformation import (
     Transformation,
     TransformationCreate,
+    TransformationPayload,
     TransformationUpdate,
     TransformationSummary,
 )
@@ -16,10 +17,23 @@ class TransformationService:
         self.repo = TransformationRepo()
         self.step_repo = TransformationStepRepo()
 
-    def get_transformations(self) -> List[Transformation]:
+    def get_transformations(
+        self, payload: TransformationPayload
+    ) -> List[Transformation]:
         """Get all transformations"""
         try:
-            transformations = self.repo.list_transformations()
+            transformations = self.repo.list_transformations(
+                search=payload.search,
+                limit=payload.limit,
+                offset=payload.offset,
+                is_desc=payload.is_desc,
+                start_date=(
+                    payload.start_date if isinstance(payload.start_date, str) else None
+                ),
+                end_date=(
+                    payload.end_date if isinstance(payload.end_date, str) else None
+                ),
+            )
             return transformations
         except Exception as e:
             raise DatabaseError("get_transformations", str(e))
@@ -104,4 +118,3 @@ class TransformationService:
             )
         except Exception as e:
             raise DatabaseError("transformation_summary", str(e))
-

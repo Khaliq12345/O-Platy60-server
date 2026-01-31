@@ -2,6 +2,11 @@
 
 from datetime import date, datetime
 from pydantic import BaseModel
+from app.models.shared import FilterPayload
+
+
+class TransformationPayload(FilterPayload):
+    pass
 
 
 class TransformationBase(BaseModel):
@@ -52,4 +57,3 @@ class TransformationSummary(Transformation):
     total_step_quantity: int
     step_count: int
     remaining_quantity: float
-

@@ -1,11 +1,12 @@
 """Transformation API endpoints."""
 
 from typing import List
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
 
 from app.models.transformation import (
     Transformation,
     TransformationCreate,
+    TransformationPayload,
     TransformationUpdate,
     TransformationSummary,
 )
@@ -18,9 +19,11 @@ router: APIRouter = APIRouter(prefix="/v1/transformations", tags=["transformatio
 @router.get("/", response_model=List[Transformation])
 def get_transformations(
     transformation_service: transformation_service_depends,
+    payload: TransformationPayload = Query(),
 ) -> List[Transformation]:
     """Retrieve all transformations."""
-    return transformation_service.get_transformations()
+    print(payload)
+    return transformation_service.get_transformations(payload)
 
 
 @router.get("/{transformation_id}", response_model=Transformation)

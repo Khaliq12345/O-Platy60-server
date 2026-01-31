@@ -1,5 +1,11 @@
 from typing import List
-from app.models.purchase import Purchase, PurchasePayload, PurchaseCreate, PurchaseUpdate, PurchaseSummary
+from app.models.purchase import (
+    Purchase,
+    PurchasePayload,
+    PurchaseCreate,
+    PurchaseUpdate,
+    PurchaseSummary,
+)
 from app.db.repositories.purchase_repository import PurchaseRepo
 from app.db.repositories.transformation_repository import TransformationRepo
 from app.core.exception import DatabaseError, ItemNotFoundError, ValidationError
@@ -14,23 +20,28 @@ class PurchaseService:
         """Get all purchases with filter or not"""
         try:
             # Date formatting
-            start_date = payload.start_date.isoformat() if payload.start_date else None
-            end_date = payload.end_date.isoformat() if payload.end_date else None
-
-            # Order formatting
-            is_desc = payload.order.value == "desc"
-
-            # Offset formatting
-            offset = (payload.page - 1) * payload.limit
+            # start_date = payload.start_date.isoformat() if payload.start_date else None
+            # end_date = payload.end_date.isoformat() if payload.end_date else None
+            #
+            # # Order formatting
+            # is_desc = payload.order.value == "desc"
+            #
+            # # Offset formatting
+            # offset = (payload.page - 1) * payload.limit
 
             purchases = self.repo.list_purchases(
-                start_date=start_date,
-                end_date=end_date,
+                search=payload.search,
+                limit=payload.limit,
+                offset=payload.offset,
+                is_desc=payload.is_desc,
+                start_date=(
+                    payload.start_date if isinstance(payload.start_date, str) else None
+                ),
+                end_date=(
+                    payload.end_date if isinstance(payload.end_date, str) else None
+                ),
                 category_id=payload.category_id,
                 created_by=payload.created_by,
-                limit=payload.limit,
-                is_desc=is_desc,
-                offset=offset,
             )
             return purchases
         except Exception as e:
@@ -50,8 +61,11 @@ class PurchaseService:
     def create_purchase(self, payload: PurchaseCreate) -> Purchase:
         """Create a new purchase"""
         if payload.quantity * payload.price_per_unit != payload.total_price:
-            raise ValidationError("create_purchase", "total_price must be equal to quantity * price_per_unit")
-        
+            raise ValidationError(
+                "create_purchase",
+                "total_price must be equal to quantity * price_per_unit",
+            )
+
         try:
             purchase = self.repo.create_purchase(payload)
             return purchase
@@ -81,21 +95,23 @@ class PurchaseService:
         try:
             # Get the purchase
             purchase = self.get_purchase(purchase_id)
-            
+
             # Get all transformations for this purchase
-            transformations = self.transformation_repo.list_transformations(purchase_id=purchase_id)
-            
+            transformations = self.transformation_repo.list_transformations(
+                purchase_id=purchase_id
+            )
+
             # Calculate totals from transformations
             total_received_quantity = sum(t.quantity_received for t in transformations)
             total_used_quantity = sum(t.quantity_usable for t in transformations)
             remaining_quantity = purchase.quantity - total_received_quantity
-            
+
             # Create summary with calculated values
             return PurchaseSummary(
                 **purchase.model_dump(),
                 total_received_quantity=total_received_quantity,
                 total_used_quantity=total_used_quantity,
-                remaining_quantity=remaining_quantity
+                remaining_quantity=remaining_quantity,
             )
         except Exception as e:
             raise DatabaseError("purchase_summary", str(e))

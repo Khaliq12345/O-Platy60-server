@@ -10,7 +10,6 @@ from app.services.serialization import serialize_for_supabase
 from app.models.purchase import (
     Purchase,
     PurchaseCreate,
-    PurchasePayload,
     PurchaseUpdate,
 )
 
@@ -25,6 +24,7 @@ class PurchaseRepo(SUPABASE):
 
     def list_purchases(
         self,
+        search: str | None = None,
         category_id: str | None = None,
         created_by: str | None = None,
         limit: int = 20,
@@ -45,6 +45,8 @@ class PurchaseRepo(SUPABASE):
             .offset(offset)
             .order("created_at", desc=is_desc)
         )
+        if search:
+            stmt = stmt.ilike("item_name", f"%{search}%")
         if category_id:
             stmt = stmt.eq("category_id", category_id)
         if created_by:
