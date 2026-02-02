@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Self
 from pydantic import BaseModel, Field, model_validator
 from enum import Enum
+import dateparser
 
 
 class Order(Enum):
@@ -21,14 +22,20 @@ class FilterPayload(BaseModel):
 
     @model_validator(mode="after")
     def validate_dates(self) -> Self:
+
         self.start_date = (
-            self.start_date.isoformat()
-            if isinstance(self.start_date, datetime)
+            dateparser.parse(self.start_date)
+            if isinstance(self.start_date, str)
             else None
         )
         self.end_date = (
-            self.end_date.isoformat() if isinstance(self.end_date, datetime) else None
+            dateparser.parse(self.end_date) if isinstance(self.end_date, str) else None
         )
+        self.start_date = (
+            self.start_date.isoformat() if self.start_date is not None else None
+        )
+        self.end_date = self.end_date.isoformat() if self.end_date is not None else None
+
         return self
 
     @property

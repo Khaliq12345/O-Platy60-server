@@ -4,7 +4,9 @@ This module provides data access layer functions for purchase entities,
 handling all CRUD operations with the Supabase database.
 """
 
-from typing import List
+from typing import List, Tuple, Union
+
+from postgrest import CountMethod
 from app.db.supabase import SUPABASE
 from app.services.serialization import serialize_for_supabase
 from app.models.purchase import (
@@ -32,7 +34,7 @@ class PurchaseRepo(SUPABASE):
         is_desc: bool = True,
         start_date: str | None = None,
         end_date: str | None = None,
-    ) -> List[Purchase]:
+    ) -> Tuple[List[Purchase], int]:
         """Retrieve all purchases from the database.
 
         Returns:
@@ -40,7 +42,7 @@ class PurchaseRepo(SUPABASE):
         """
         stmt = (
             self.client.table(TABLE_NAME)
-            .select("*")
+            .select("*", count=CountMethod.exact)
             .limit(limit)
             .offset(offset)
             .order("created_at", desc=is_desc)
@@ -58,7 +60,10 @@ class PurchaseRepo(SUPABASE):
 
         resp = stmt.execute()
 
-        return [Purchase.model_validate(row) for row in resp.data]
+        return (
+            [Purchase.model_validate(row) for row in resp.data],
+            resp.count if resp.count else 0,
+        )
 
     def get_purchase_by_id(self, purchase_id: str) -> Purchase | None:
         """Retrieve a specific purchase by its ID.

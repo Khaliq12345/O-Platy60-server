@@ -4,7 +4,9 @@ This module provides data access layer functions for transformation entities,
 handling all CRUD operations with the Supabase database.
 """
 
-from typing import List
+from typing import List, Tuple
+
+from postgrest import CountMethod
 from app.db.supabase import SUPABASE
 from app.services.serialization import serialize_for_supabase
 from app.models.transformation import (
@@ -30,7 +32,7 @@ class TransformationRepo(SUPABASE):
         is_desc: bool = True,
         start_date: str | None = None,
         end_date: str | None = None,
-    ) -> List[Transformation]:
+    ) -> Tuple[List[Transformation], int]:
         """Retrieve all transformations from the database.
 
         Returns:
@@ -38,7 +40,7 @@ class TransformationRepo(SUPABASE):
         """
         stmt = (
             self.client.table(TABLE_NAME)
-            .select("*")
+            .select("*", count=CountMethod.exact)
             .limit(limit)
             .offset(offset)
             .order("transformation_date", desc=is_desc)
@@ -46,12 +48,14 @@ class TransformationRepo(SUPABASE):
         if search:
             stmt = stmt.ilike("product_name", f"%{search}%")
         if start_date:
+            print(start_date)
             stmt = stmt.gte("transformation_date", start_date)
         if end_date:
+            print(end_date)
             stmt = stmt.lte("transformation_date", end_date)
 
         resp = stmt.execute()
-        return [Transformation.model_validate(row) for row in resp.data]
+        return ([Transformation.model_validate(row) for row in resp.data], resp.count if resp.count else 0)
 
     def get_transformation_by_id(self, transformation_id: str) -> Transformation | None:
         """Retrieve a specific transformation by its ID.

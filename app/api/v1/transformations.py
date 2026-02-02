@@ -1,6 +1,6 @@
 """Transformation API endpoints."""
 
-from typing import List
+from typing import Dict, List
 from fastapi import APIRouter, Query, status
 
 from app.models.transformation import (
@@ -16,13 +16,12 @@ from app.api.deps import transformation_service_depends
 router: APIRouter = APIRouter(prefix="/v1/transformations", tags=["transformations"])
 
 
-@router.get("/", response_model=List[Transformation])
+@router.get("/", response_model=Dict[str, List[Transformation] | int])
 def get_transformations(
     transformation_service: transformation_service_depends,
     payload: TransformationPayload = Query(),
 ) -> List[Transformation]:
     """Retrieve all transformations."""
-    print(payload)
     return transformation_service.get_transformations(payload)
 
 

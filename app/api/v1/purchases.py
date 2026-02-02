@@ -4,7 +4,7 @@ This module defines REST API endpoints for purchase management,
 including CRUD operations and business logic for food purchases.
 """
 
-from typing import List
+from typing import Dict, List
 from fastapi import APIRouter, Query, status
 
 from app.models.purchase import (
@@ -20,10 +20,10 @@ from app.api.deps import purchase_service_depends
 router: APIRouter = APIRouter(prefix="/v1/purchases", tags=["purchases"])
 
 
-@router.get("/", response_model=List[Purchase])
+@router.get("/", response_model=Dict[str, List[Purchase] | int])
 def get_purchases(
     purchase_service: purchase_service_depends, payload: PurchasePayload = Query()
-) -> List[Purchase]:
+) -> Dict[str, List[Purchase] | int]:
     """Retrieve all purchases."""
     return purchase_service.get_purchases(payload)
 
@@ -59,7 +59,9 @@ def get_purchase_summary(
 
 
 @router.post("/", response_model=Purchase, status_code=status.HTTP_201_CREATED)
-def create_purchase_endpoint(purchase_service: purchase_service_depends, payload: PurchaseCreate) -> Purchase:
+def create_purchase_endpoint(
+    purchase_service: purchase_service_depends, payload: PurchaseCreate
+) -> Purchase:
     """Create a new purchase.
 
     Args:
@@ -72,7 +74,11 @@ def create_purchase_endpoint(purchase_service: purchase_service_depends, payload
 
 
 @router.put("/{purchase_id}", response_model=Purchase)
-def update_purchase_endpoint(purchase_service: purchase_service_depends, purchase_id: str, payload: PurchaseUpdate) -> Purchase:
+def update_purchase_endpoint(
+    purchase_service: purchase_service_depends,
+    purchase_id: str,
+    payload: PurchaseUpdate,
+) -> Purchase:
     """Update an existing purchase.
 
     Args:
@@ -86,7 +92,9 @@ def update_purchase_endpoint(purchase_service: purchase_service_depends, purchas
 
 
 @router.delete("/{purchase_id}")
-def delete_purchase_endpoint(purchase_service: purchase_service_depends, purchase_id: str) -> None:
+def delete_purchase_endpoint(
+    purchase_service: purchase_service_depends, purchase_id: str
+) -> None:
     """Delete a purchase.
 
     Args:

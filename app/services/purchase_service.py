@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 from app.models.purchase import (
     Purchase,
     PurchasePayload,
@@ -16,20 +16,12 @@ class PurchaseService:
         self.repo = PurchaseRepo()
         self.transformation_repo = TransformationRepo()
 
-    def get_purchases(self, payload: PurchasePayload) -> List[Purchase]:
+    def get_purchases(
+        self, payload: PurchasePayload
+    ) -> Dict[str, List[Purchase] | int]:
         """Get all purchases with filter or not"""
         try:
-            # Date formatting
-            # start_date = payload.start_date.isoformat() if payload.start_date else None
-            # end_date = payload.end_date.isoformat() if payload.end_date else None
-            #
-            # # Order formatting
-            # is_desc = payload.order.value == "desc"
-            #
-            # # Offset formatting
-            # offset = (payload.page - 1) * payload.limit
-
-            purchases = self.repo.list_purchases(
+            purchases, count = self.repo.list_purchases(
                 search=payload.search,
                 limit=payload.limit,
                 offset=payload.offset,
@@ -43,7 +35,7 @@ class PurchaseService:
                 category_id=payload.category_id,
                 created_by=payload.created_by,
             )
-            return purchases
+            return {"purchases": purchases, "count": count}
         except Exception as e:
             raise DatabaseError("get_purchases", str(e))
 

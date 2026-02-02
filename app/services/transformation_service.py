@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 from app.db.repositories.transformation_repository import TransformationRepo
 from app.db.repositories.transformation_step_repository import TransformationStepRepo
 from app.core.exception import DatabaseError, ItemNotFoundError
@@ -19,10 +19,10 @@ class TransformationService:
 
     def get_transformations(
         self, payload: TransformationPayload
-    ) -> List[Transformation]:
+    ) -> Dict[str, List[Transformation] | int]:
         """Get all transformations"""
         try:
-            transformations = self.repo.list_transformations(
+            transformations, count = self.repo.list_transformations(
                 search=payload.search,
                 limit=payload.limit,
                 offset=payload.offset,
@@ -34,7 +34,7 @@ class TransformationService:
                     payload.end_date if isinstance(payload.end_date, str) else None
                 ),
             )
-            return transformations
+            return {"transformations": transformations, "count": count}
         except Exception as e:
             raise DatabaseError("get_transformations", str(e))
 
