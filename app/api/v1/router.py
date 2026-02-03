@@ -6,6 +6,7 @@ API router that will be included in the FastAPI application.
 
 from fastapi import APIRouter
 from app.api.v1 import (
+    auth,
     categories,
     purchases,
     transformations,
@@ -17,6 +18,7 @@ from app.api.v1 import (
 api_router: APIRouter = APIRouter()
 
 # Include all v1 routers
+api_router.include_router(auth.router)
 api_router.include_router(categories.router)
 api_router.include_router(purchases.router)
 api_router.include_router(transformations.router)
