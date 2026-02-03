@@ -81,7 +81,6 @@ class PurchaseRepo(SUPABASE):
             .execute()
         )
         data = resp.data
-        print(data)
         if data:
             return Purchase.model_validate(data[0])
         return None
