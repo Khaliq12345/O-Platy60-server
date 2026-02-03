@@ -7,6 +7,7 @@ bearer_scheme = HTTPBearer()
 
 
 def check_login(token: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> bool:
+    print("token: ", token)
     client = SUPABASE().client
     try:
         response = client.auth.get_user(token.credentials)
@@ -27,14 +28,3 @@ def check_login(token: HTTPAuthorizationCredentials = Depends(bearer_scheme)) ->
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
     
-
-def update_session(rtoken: str) -> dict[str, Any]:
-    client = SUPABASE().client
-    response = client.auth.refresh_session(rtoken)
-    return {
-        "access_token": response.session.access_token,
-        "refresh_token": response.session.refresh_token,
-        "user_id": response.user.id,
-        "email": response.user.email,
-        "metadata": response.user.user_metadata,
-    }

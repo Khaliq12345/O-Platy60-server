@@ -13,9 +13,7 @@ from app.api.deps import transformation_step_service_depends
 from app.utils.auth import check_login
 
 router: APIRouter = APIRouter(
-    prefix="/v1/transformation-steps",
-    tags=["transformation-steps"],
-    dependencies=[Depends(check_login)],
+    prefix="/v1/transformation-steps", tags=["transformation-steps"]
 )
 
 

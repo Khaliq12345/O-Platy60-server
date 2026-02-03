@@ -11,12 +11,9 @@ from app.models.category import (
 )
 from app.api.deps import auth_service_depends, category_service_depends
 from app.utils.auth import check_login
+from app.services.auth_service import AuthService
 
-router: APIRouter = APIRouter(
-    prefix="/v1/categories",
-    tags=["categories"],
-    dependencies=[Depends(check_login)],
-)
+router: APIRouter = APIRouter(prefix="/v1/categories", tags=["categories"])
 
 
 @router.get("/", response_model=List[Category])

@@ -17,7 +17,6 @@ from app.utils.auth import check_login
 router: APIRouter = APIRouter(
     prefix="/v1/transformations",
     tags=["transformations"],
-    dependencies=[Depends(check_login)],
 )
 
 

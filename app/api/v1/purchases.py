@@ -18,9 +18,7 @@ from app.api.deps import purchase_service_depends
 from app.utils.auth import check_login
 
 # Create router with prefix and tags for OpenAPI documentation
-router: APIRouter = APIRouter(
-    prefix="/v1/purchases", tags=["purchases"], dependencies=[Depends(check_login)]
-)
+router: APIRouter = APIRouter(prefix="/v1/purchases", tags=["purchases"])
 
 
 @router.get("/", response_model=Dict[str, List[Purchase] | int])

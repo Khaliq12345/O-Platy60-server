@@ -6,7 +6,6 @@ from fastapi import APIRouter, HTTPException, status
 from app.models.auth import AuthForm, AuthResponse, LogoutRequest, RefreshTokenRequest 
 from app.api.deps import auth_service_depends
 from app.core.exception import DatabaseError
-from app.utils.auth import update_session
 
 router: APIRouter = APIRouter(prefix="/v1/auth", tags=["auth"])
 
