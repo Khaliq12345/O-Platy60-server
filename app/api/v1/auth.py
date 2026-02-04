@@ -3,11 +3,22 @@
 from typing import Dict
 from fastapi import APIRouter, HTTPException, status
 
-from app.models.auth import AuthForm, AuthResponse, LogoutRequest, RefreshTokenRequest 
+from app.models.auth import AuthForm, AuthResponse, LogoutRequest, RefreshTokenRequest, SignupForm 
 from app.api.deps import auth_service_depends
 from app.core.exception import DatabaseError
 
 router: APIRouter = APIRouter(prefix="/v1/auth", tags=["auth"])
+
+@router.post("/signup", response_model=AuthResponse)
+def signup(form: SignupForm, auth_service: auth_service_depends):
+    """Register new user with email and password"""
+    try:
+        return auth_service.signup(form)
+    except DatabaseError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
 @router.post("/login", response_model=AuthResponse)
 def login(form: AuthForm, auth_service: auth_service_depends):

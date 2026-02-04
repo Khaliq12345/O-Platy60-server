@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from app.models.auth import AuthForm, AuthResponse
+from app.models.auth import AuthForm, AuthResponse, SignupForm
 from app.db.repositories.auth_repository import AuthRepo
 from app.core.exception import DatabaseError
 
@@ -21,6 +21,13 @@ class AuthService:
             return self.repo.sign_out()
         except Exception as e:
             raise DatabaseError("logout", str(e))
+
+    def signup(self, form: SignupForm) -> AuthResponse:
+        """Register new user with email and password"""
+        try:
+            return self.repo.sign_up(form)
+        except Exception as e:
+            raise DatabaseError("signup", str(e))
 
     def validate_token(self, token: str) -> bool:
         """Validate user token"""
