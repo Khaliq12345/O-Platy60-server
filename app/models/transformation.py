@@ -1,7 +1,8 @@
 """Transformation data models."""
 
 from datetime import date, datetime
-from pydantic import BaseModel
+from typing import Self
+from pydantic import BaseModel, model_validator
 from app.models.shared import FilterPayload
 
 
@@ -19,15 +20,20 @@ class TransformationBase(BaseModel):
     notes: str | None = None
     cook_signature: str | None = None
     manager_signature: str | None = None
-    total_quantity_used: float | None = None
-    remaining_quantity: float | None = None
-    total_portions: int | None = None
-    total_wastes: float | None = None
+    total_quantity_used: float = 0.0
+    remaining_quantity: float = 0.0
+    total_portions: int = 0
+    total_wastes: float = 0.0
     unit: str
 
 
 class TransformationCreate(TransformationBase):
     created_by: str
+
+    @model_validator(mode="after")
+    def capitalize(self) -> Self:
+        self.remaining_quantity = self.quantity_usable
+        return self
 
 
 class TransformationUpdate(BaseModel):

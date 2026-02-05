@@ -24,6 +24,7 @@ api_router.include_router(auth.router)
 api_router.include_router(categories.router, dependencies=[Depends(check_login)])
 api_router.include_router(purchases.router, dependencies=[Depends(check_login)])
 api_router.include_router(transformations.router, dependencies=[Depends(check_login)])
-api_router.include_router(transformations_steps.router, dependencies=[Depends(check_login)])
+api_router.include_router(
+    transformations_steps.router, dependencies=[Depends(check_login)]
+)
 api_router.include_router(users.router)
-

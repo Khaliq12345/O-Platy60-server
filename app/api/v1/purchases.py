@@ -5,7 +5,7 @@ including CRUD operations and business logic for food purchases.
 """
 
 from typing import Dict, List
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Query, status
 
 from app.models.purchase import (
     Purchase,
@@ -15,7 +15,6 @@ from app.models.purchase import (
     PurchaseSummary,
 )
 from app.api.deps import purchase_service_depends
-from app.utils.auth import check_login
 
 # Create router with prefix and tags for OpenAPI documentation
 router: APIRouter = APIRouter(prefix="/v1/purchases", tags=["purchases"])

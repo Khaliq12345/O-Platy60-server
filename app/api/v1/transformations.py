@@ -1,7 +1,7 @@
 """Transformation API endpoints."""
 
 from typing import Dict, List
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Query, status
 
 from app.models.transformation import (
     Transformation,
@@ -11,7 +11,6 @@ from app.models.transformation import (
     TransformationSummary,
 )
 from app.api.deps import transformation_service_depends
-from app.utils.auth import check_login
 
 # Create router with prefix and tags for OpenAPI documentation
 router: APIRouter = APIRouter(
