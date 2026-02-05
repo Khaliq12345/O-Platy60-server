@@ -55,7 +55,10 @@ class TransformationRepo(SUPABASE):
             stmt = stmt.lte("transformation_date", end_date)
 
         resp = stmt.execute()
-        return ([Transformation.model_validate(row) for row in resp.data], resp.count if resp.count else 0)
+        return (
+            [Transformation.model_validate(row) for row in resp.data],
+            resp.count if resp.count else 0,
+        )
 
     def get_transformation_by_id(self, transformation_id: str) -> Transformation | None:
         """Retrieve a specific transformation by its ID.

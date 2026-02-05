@@ -26,14 +26,15 @@ class TransformationBase(BaseModel):
     total_wastes: float = 0.0
     unit: str
 
+    @model_validator(mode="after")
+    def capitalize(self) -> Self:
+        if self.remaining_quantity == 0.0:
+            self.remaining_quantity = self.quantity_usable
+        return self
+
 
 class TransformationCreate(TransformationBase):
     created_by: str
-
-    @model_validator(mode="after")
-    def capitalize(self) -> Self:
-        self.remaining_quantity = self.quantity_usable
-        return self
 
 
 class TransformationUpdate(BaseModel):

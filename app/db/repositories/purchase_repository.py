@@ -95,7 +95,6 @@ class PurchaseRepo(SUPABASE):
             Purchase: The newly created purchase record
         """
         data = serialize_for_supabase(payload.model_dump())
-        print(data)
         resp = self.client.table(TABLE_NAME).insert(data).execute()
         return Purchase.model_validate(resp.data[0])
 

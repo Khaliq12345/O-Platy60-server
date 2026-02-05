@@ -1,7 +1,7 @@
 """Category API endpoints."""
 
 from typing import List
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, status, Query
 
 from app.models.category import (
     Category,
@@ -9,9 +9,7 @@ from app.models.category import (
     CategoryUpdate,
     CategoryPayload,
 )
-from app.api.deps import auth_service_depends, category_service_depends
-from app.utils.auth import check_login
-from app.services.auth_service import AuthService
+from app.api.deps import category_service_depends
 
 router: APIRouter = APIRouter(prefix="/v1/categories", tags=["categories"])
 
