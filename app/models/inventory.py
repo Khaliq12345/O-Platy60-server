@@ -2,6 +2,11 @@ from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
+from app.models.shared import FilterPayload
+
+
+class InventoryPayload(FilterPayload):
+    category_id: str | None = None
 
 
 class InventoryBase(BaseModel):
