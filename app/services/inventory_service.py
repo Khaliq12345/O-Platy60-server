@@ -12,7 +12,7 @@ class InventoryService:
         """Get all inventories"""
         try:
             inventories = await self.repo.get_all()
-            return [InventoryResponse(**inv) for inv in inventories]
+            return inventories
         except Exception as e:
             raise DatabaseError("get_all_inventories", str(e))
 
@@ -22,17 +22,17 @@ class InventoryService:
             inventory = await self.repo.get_by_id(inventory_id)
             if not inventory:
                 raise ItemNotFoundError("get_inventory", str(inventory_id))
-            return InventoryResponse(**inventory)
+            return inventory
         except ItemNotFoundError:
             raise
         except Exception as e:
             raise DatabaseError("get_inventory", str(e))
 
-    async def create_inventory(self, payload: InventoryCreate) -> InventoryResponse:
+    async def create_inventory(self, payload: InventoryCreate) -> InventoryResponse | None:
         """Create a new inventory"""
         try:
             inventory = await self.repo.create(payload)
-            return InventoryResponse(**inventory)
+            return inventory
         except Exception as e:
             raise DatabaseError("create_inventory", str(e))
 
@@ -44,7 +44,7 @@ class InventoryService:
             inventory = await self.repo.update(inventory_id, payload)
             if not inventory:
                 raise ItemNotFoundError("update_inventory", str(inventory_id))
-            return InventoryResponse(**inventory)
+            return inventory
         except ItemNotFoundError:
             raise
         except Exception as e:

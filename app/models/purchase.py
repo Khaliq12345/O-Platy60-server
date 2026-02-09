@@ -10,7 +10,6 @@ from typing import List
 class PurchasePayload(FilterPayload):
     category_id: str | None = None
     created_by: str | None = None
-    inventory_id: str | None = None
 
 
 class PurchaseBase(BaseModel):
