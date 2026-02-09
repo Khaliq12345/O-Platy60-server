@@ -7,6 +7,7 @@ from app.services.transformation_service import TransformationService
 from app.services.transformation_step_service import TransformationStepService
 from app.services.user_service import UserService
 from app.services.auth_service import AuthService
+from app.services.inventory_service import InventoryService
 
 purchase_service_depends = Annotated[PurchaseService, Depends(PurchaseService)]
 category_service_depends = Annotated[CategoryService, Depends(CategoryService)]
@@ -14,4 +15,4 @@ transformation_service_depends = Annotated[TransformationService, Depends(Transf
 transformation_step_service_depends = Annotated[TransformationStepService, Depends(TransformationStepService)]
 user_service_depends = Annotated[UserService, Depends(UserService)]
 auth_service_depends = Annotated[AuthService, Depends(AuthService)]
-
+inventory_service_depends = Annotated[InventoryService, Depends(InventoryService)]
