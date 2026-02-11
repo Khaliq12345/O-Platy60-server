@@ -4,7 +4,7 @@ This module provides data access layer functions for authentication,
 handling login and logout operations with Supabase auth.
 """
 
-from typing import Dict, Any
+from typing import Dict
 
 from app.db.supabase import SUPABASE
 from app.models.auth import AuthForm, AuthResponse, SignupForm

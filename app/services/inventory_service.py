@@ -1,14 +1,24 @@
 from typing import Dict, List
-from app.models.inventory import InventoryCreate, InventoryUpdate, InventoryResponse, InventoryPayload
-from app.db.repositories.inventory_repository import InventoryRepository
+
 from app.core.exception import DatabaseError, ItemNotFoundError
+from app.db.repositories.inventory_repository import InventoryRepository
+from app.models.inventory import (
+    InventoryCreate,
+    InventoryPayload,
+    InventoryResponse,
+    InventoryTransaction,
+    InventoryTransactionCreate,
+    InventoryUpdate,
+)
 
 
 class InventoryService:
     def __init__(self) -> None:
         self.repo = InventoryRepository()
 
-    def get_inventories(self, payload: InventoryPayload) -> Dict[str, List[InventoryResponse] | int]:
+    def get_inventories(
+        self, payload: InventoryPayload
+    ) -> Dict[str, List[InventoryResponse] | int]:
         """Get all inventories with filters"""
         try:
             inventories, count = self.repo.list_inventories(
@@ -16,8 +26,12 @@ class InventoryService:
                 limit=payload.limit,
                 offset=payload.offset,
                 is_desc=payload.is_desc,
-                start_date=payload.start_date if isinstance(payload.start_date, str) else None,
-                end_date=payload.end_date if isinstance(payload.end_date, str) else None,
+                start_date=payload.start_date
+                if isinstance(payload.start_date, str)
+                else None,
+                end_date=payload.end_date
+                if isinstance(payload.end_date, str)
+                else None,
                 category_id=payload.category_id,
             )
             return {"inventories": inventories, "count": count}
@@ -44,7 +58,9 @@ class InventoryService:
         except Exception as e:
             raise DatabaseError("create_inventory", str(e))
 
-    def update_inventory(self, inventory_id: str, payload: InventoryUpdate) -> InventoryResponse:
+    def update_inventory(
+        self, inventory_id: str, payload: InventoryUpdate
+    ) -> InventoryResponse:
         """Update an existing inventory"""
         try:
             inventory = self.repo.update(inventory_id, payload)
@@ -63,3 +79,27 @@ class InventoryService:
             self.repo.delete(inventory_id)
         except Exception as e:
             raise DatabaseError("delete_inventory", str(e))
+
+    def add_transaction(
+        self, payload: InventoryTransactionCreate
+    ) -> InventoryTransaction:
+        """Add a transaction to an inventory"""
+        try:
+            transaction = self.repo.add_transaction(payload)
+            return transaction
+        except Exception as e:
+            raise DatabaseError("add_transaction", str(e))
+
+    def get_transactions(
+        self, inventory_id: str, payload: InventoryPayload
+    ) -> List[InventoryTransaction]:
+        """Retrieve all transactions for a specific inventory"""
+        try:
+            transactions = self.repo.get_transactions(
+                inventory_id=inventory_id,
+                start_date=payload.start_date,
+                end_date=payload.end_date,
+            )
+            return transactions
+        except Exception as e:
+            raise DatabaseError("get_transactions", str(e))
