@@ -36,6 +36,7 @@ def create_inventory(
     inventory_service: inventory_service_depends, payload: InventoryCreate
 ) -> InventoryResponse:
     """Create a new inventory"""
+    print(payload)
     return inventory_service.create_inventory(payload)
 
 

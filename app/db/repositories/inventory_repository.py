@@ -30,7 +30,7 @@ class InventoryRepository(SUPABASE):
     ) -> Tuple[List[InventoryResponse], int]:
         stmt = (
             self.client.table(TABLE_NAME)
-            .select("*", count=CountMethod.exact)
+            .select("*, inventory_transaction(*)", count=CountMethod.exact)
             .limit(limit)
             .offset(offset)
             .order("created_at", desc=is_desc)
@@ -45,6 +45,7 @@ class InventoryRepository(SUPABASE):
             stmt = stmt.lte("created_at", end_date)
 
         resp = stmt.execute()
+        print(resp)
         return (
             [InventoryResponse.model_validate(row) for row in resp.data],
             resp.count if resp.count else 0,
