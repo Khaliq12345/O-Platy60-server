@@ -2,13 +2,15 @@ from typing import Dict, List
 
 from fastapi import APIRouter, Query, status
 
+from app.api.deps import inventory_service_depends
 from app.models.inventory import (
     InventoryCreate,
-    InventoryResponse,
-    InventoryUpdate,
     InventoryPayload,
+    InventoryResponse,
+    InventoryTransaction,
+    InventoryTransactionCreate,
+    InventoryUpdate,
 )
-from app.api.deps import inventory_service_depends
 
 router = APIRouter(prefix="/v1/inventories", tags=["inventories"])
 
@@ -22,7 +24,9 @@ def get_inventories(
 
 
 @router.get("/{inventory_id}", response_model=InventoryResponse)
-def get_inventory(inventory_service: inventory_service_depends, inventory_id: str) -> InventoryResponse:
+def get_inventory(
+    inventory_service: inventory_service_depends, inventory_id: str
+) -> InventoryResponse:
     """Retrieve a specific inventory by ID"""
     return inventory_service.get_inventory(inventory_id)
 
@@ -51,3 +55,26 @@ def delete_inventory(
 ) -> None:
     """Delete an inventory"""
     inventory_service.delete_inventory(inventory_id)
+
+
+@router.post(
+    "/transactions",
+    response_model=InventoryTransaction,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_transaction(
+    inventory_service: inventory_service_depends,
+    payload: InventoryTransactionCreate,
+) -> InventoryTransaction:
+    """Add a transaction to an inventory"""
+    return inventory_service.add_transaction(payload)
+
+
+@router.get("/{inventory_id}/transactions", response_model=List[InventoryTransaction])
+def get_transactions(
+    inventory_service: inventory_service_depends,
+    inventory_id: str,
+    payload: InventoryPayload = Query(),
+) -> List[InventoryTransaction]:
+    """Retrieve all transactions for a specific inventory"""
+    return inventory_service.get_transactions(inventory_id, payload)

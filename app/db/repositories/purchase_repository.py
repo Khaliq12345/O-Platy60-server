@@ -4,7 +4,7 @@ This module provides data access layer functions for purchase entities,
 handling all CRUD operations with the Supabase database.
 """
 
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 from postgrest import CountMethod
 from app.db.supabase import SUPABASE

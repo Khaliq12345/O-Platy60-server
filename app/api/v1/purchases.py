@@ -12,7 +12,6 @@ from app.models.purchase import (
     PurchaseCreate,
     PurchasePayload,
     PurchaseUpdate,
-    PurchaseSummary,
 )
 from app.api.deps import purchase_service_depends
 
@@ -43,10 +42,10 @@ def get_purchase(
     return purchase_service.get_purchase(purchase_id)
 
 
-@router.get("/{purchase_id}/summary", response_model=PurchaseSummary)
+@router.get("/{purchase_id}/summary", response_model=Purchase)
 def get_purchase_summary(
     purchase_service: purchase_service_depends, purchase_id: str
-) -> PurchaseSummary:
+) -> Purchase:
     """Retrieve purchase summary with transformation calculations.
 
     Args:

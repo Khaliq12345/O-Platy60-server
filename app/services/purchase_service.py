@@ -4,7 +4,6 @@ from app.models.purchase import (
     PurchasePayload,
     PurchaseCreate,
     PurchaseUpdate,
-    PurchaseSummary,
 )
 from app.db.repositories.purchase_repository import PurchaseRepo
 from app.db.repositories.transformation_repository import TransformationRepo
@@ -83,7 +82,7 @@ class PurchaseService:
         except Exception as e:
             raise DatabaseError("delete_purchase", str(e))
 
-    def purchase_summary(self, purchase_id: str) -> PurchaseSummary:
+    def purchase_summary(self, purchase_id: str) -> Purchase:
         try:
             # Get the purchase
             purchase = self.get_purchase(purchase_id)
@@ -99,7 +98,7 @@ class PurchaseService:
             remaining_quantity = purchase.quantity - total_received_quantity
 
             # Create summary with calculated values
-            return PurchaseSummary(
+            return Purchase(
                 **purchase.model_dump(),
                 total_received_quantity=total_received_quantity,
                 total_used_quantity=total_used_quantity,
