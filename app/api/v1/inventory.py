@@ -10,6 +10,8 @@ from app.models.inventory import (
     InventoryTransaction,
     InventoryTransactionCreate,
     InventoryUpdate,
+    InventoryWeeklySummary,
+    InventoryWeeklySummaryQuery,
 )
 
 router = APIRouter(prefix="/v1/inventories", tags=["inventories"])
@@ -36,7 +38,6 @@ def create_inventory(
     inventory_service: inventory_service_depends, payload: InventoryCreate
 ) -> InventoryResponse:
     """Create a new inventory"""
-    print(payload)
     return inventory_service.create_inventory(payload)
 
 
@@ -79,3 +80,11 @@ def get_transactions(
 ) -> List[InventoryTransaction]:
     """Retrieve all transactions for a specific inventory"""
     return inventory_service.get_transactions(inventory_id, payload)
+
+
+@router.post("/weekly-summary", response_model=InventoryWeeklySummary)
+def get_weekly_summary(
+    inventory_service: inventory_service_depends, payload: InventoryWeeklySummaryQuery
+) -> InventoryWeeklySummary:
+    """Retrieve weekly summary for a specific inventory"""
+    return inventory_service.get_weekly_summary(payload)

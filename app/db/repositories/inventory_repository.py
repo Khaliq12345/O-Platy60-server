@@ -9,6 +9,8 @@ from app.models.inventory import (
     InventoryTransaction,
     InventoryTransactionCreate,
     InventoryUpdate,
+    InventoryWeeklySummary,
+    InventoryWeeklySummaryQuery,
 )
 
 TABLE_NAME = "inventory"
@@ -30,7 +32,7 @@ class InventoryRepository(SUPABASE):
     ) -> Tuple[List[InventoryResponse], int]:
         stmt = (
             self.client.table(TABLE_NAME)
-            .select("*, inventory_transaction(*)", count=CountMethod.exact)
+            .select("*, daily_transaction_summary(*)", count=CountMethod.exact)
             .limit(limit)
             .offset(offset)
             .order("created_at", desc=is_desc)
@@ -45,7 +47,6 @@ class InventoryRepository(SUPABASE):
             stmt = stmt.lte("created_at", end_date)
 
         resp = stmt.execute()
-        print(resp)
         return (
             [InventoryResponse.model_validate(row) for row in resp.data],
             resp.count if resp.count else 0,
@@ -95,17 +96,6 @@ class InventoryRepository(SUPABASE):
 
     def add_transaction(self, transaction: InventoryTransactionCreate):
         data = transaction.model_dump()
-        older = self.get_day_transaction(
-            transaction.created_at, transaction.inventory_id
-        )
-        if older:
-            print("Existing transaction found")
-            older.sale = transaction.sale
-            self.client.table("inventory_transaction").update(older.model_dump()).eq(
-                "id", older.id
-            ).execute()
-            return older
-        print("No transaction found")
         response = self.client.table("inventory_transaction").insert(data).execute()
         return InventoryTransaction.model_validate(response.data[0])
 
@@ -153,3 +143,14 @@ class InventoryRepository(SUPABASE):
         if len(response.data) > 0:
             return InventoryTransaction.model_validate(response.data[0])
         return None
+
+    def get_weekly_summary(self, payload: InventoryWeeklySummaryQuery):
+        data = payload.model_dump()
+        input = {
+            "p_current_manual_qty": data["manual_qty"],
+            "p_start_date": data["start_date"],
+            "p_end_date": data["end_date"],
+            "p_inventory_id": data["inventory_id"],
+        }
+        response = self.client.rpc("calculate_weekly_summary", input).execute()
+        return InventoryWeeklySummary.model_validate(response.data[0])

@@ -1,13 +1,14 @@
-from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Any
+
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 from app.db.supabase import SUPABASE
 
 bearer_scheme = HTTPBearer()
 
 
 def check_login(token: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> bool:
-    print("token: ", token)
     client = SUPABASE().client
     try:
         response = client.auth.get_user(token.credentials)
@@ -27,4 +28,3 @@ def check_login(token: HTTPAuthorizationCredentials = Depends(bearer_scheme)) ->
         return True
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
-    
