@@ -9,6 +9,8 @@ from app.models.inventory import (
     InventoryTransaction,
     InventoryTransactionCreate,
     InventoryUpdate,
+    InventoryWeeklySummary,
+    InventoryWeeklySummaryQuery,
 )
 
 
@@ -40,6 +42,7 @@ class InventoryService:
 
     def get_inventory(self, inventory_id: str) -> InventoryResponse:
         """Get a single inventory"""
+        print("unsupposed call")
         try:
             inventory = self.repo.get_by_id(inventory_id)
             if not inventory:
@@ -103,3 +106,13 @@ class InventoryService:
             return transactions
         except Exception as e:
             raise DatabaseError("get_transactions", str(e))
+
+    def get_weekly_summary(
+        self, payload: InventoryWeeklySummaryQuery
+    ) -> InventoryWeeklySummary:
+        """Retrieve weekly summary for a specific inventory"""
+        try:
+            summary = self.repo.get_weekly_summary(payload)
+            return summary
+        except Exception as e:
+            raise DatabaseError("get_weekly_summary", str(e))

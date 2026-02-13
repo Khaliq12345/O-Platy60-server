@@ -1,5 +1,3 @@
-from datetime import datetime
-from re import L
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -58,7 +56,28 @@ class InventoryUpdate(BaseModel):
     category: Optional[str] = None
 
 
+class DailyTransactionSummary(BaseModel):
+    created_at: str
+    total_sales: int
+    total_quantity: int
+    inventory_id: str
+    summary_date: str
+
+
 class InventoryResponse(InventoryBase):
     inventory_id: str
-    created_at: datetime
-    inventory_transaction: List[InventoryTransaction] = []
+    created_at: str
+    daily_transaction_summary: List[DailyTransactionSummary] = []
+
+
+class InventoryWeeklySummary(BaseModel):
+    final_quantity: int
+    total_sales: int
+    calculated_diff: int
+
+
+class InventoryWeeklySummaryQuery(BaseModel):
+    manual_qty: int
+    end_date: str
+    inventory_id: str
+    start_date: str
