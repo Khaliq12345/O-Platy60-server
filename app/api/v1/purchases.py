@@ -5,15 +5,15 @@ including CRUD operations and business logic for food purchases.
 """
 
 from typing import Dict, List
+
 from fastapi import APIRouter, Query, status
 
+from app.api.deps import purchase_service_depends
 from app.models.purchase import (
     Purchase,
     PurchaseCreate,
     PurchasePayload,
-    PurchaseUpdate,
 )
-from app.api.deps import purchase_service_depends
 
 # Create router with prefix and tags for OpenAPI documentation
 router: APIRouter = APIRouter(prefix="/v1/purchases", tags=["purchases"])
@@ -69,25 +69,7 @@ def create_purchase_endpoint(
     Returns:
         Purchase: The newly created purchase
     """
-    return purchase_service.create_purchase(payload)
-
-
-@router.put("/{purchase_id}", response_model=Purchase)
-def update_purchase_endpoint(
-    purchase_service: purchase_service_depends,
-    purchase_id: str,
-    payload: PurchaseUpdate,
-) -> Purchase:
-    """Update an existing purchase.
-
-    Args:
-        purchase_id: Unique identifier of the purchase to update
-        payload: Purchase update data (only provided fields will be updated)
-
-    Returns:
-        Purchase: The updated purchase
-    """
-    return purchase_service.update_purchase(purchase_id, payload)
+    return purchase_service.create_purchase(payload) 
 
 
 @router.delete("/{purchase_id}")

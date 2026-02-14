@@ -1,23 +1,24 @@
 """Category API endpoints."""
 
-from typing import List
-from fastapi import APIRouter, status, Query
+from typing import Dict, List
 
+from fastapi import APIRouter, Query, status
+
+from app.api.deps import category_service_depends
 from app.models.category import (
     Category,
     CategoryCreate,
-    CategoryUpdate,
     CategoryPayload,
+    CategoryUpdate,
 )
-from app.api.deps import category_service_depends
 
 router: APIRouter = APIRouter(prefix="/v1/categories", tags=["categories"])
 
 
-@router.get("/", response_model=List[Category])
+@router.get("/", response_model=Dict[str, List[Category] | int])
 def get_categories(
     category_service: category_service_depends, payload: CategoryPayload = Query()
-) -> List[Category]:
+) -> Dict[str, List[Category] | int]:
     """Retrieve all categories."""
     return category_service.get_categories(payload)
 

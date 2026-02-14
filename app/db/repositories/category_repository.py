@@ -1,10 +1,12 @@
 """Category repository for database operations."""
 
-from typing import List
-from app.db.supabase import SUPABASE
-from app.services.serialization import serialize_for_supabase
-from app.models.category import Category, CategoryCreate, CategoryUpdate
+from typing import List, Tuple
 
+from postgrest import CountMethod
+
+from app.db.supabase import SUPABASE
+from app.models.category import Category, CategoryCreate, CategoryUpdate
+from app.services.serialization import serialize_for_supabase
 
 TABLE_NAME: str = "categories"
 
@@ -20,11 +22,11 @@ class CategoryRepo(SUPABASE):
         is_desc: bool = True,
         start_date: str | None = None,
         end_date: str | None = None,
-    ) -> List[Category]:
+    ) -> Tuple[List[Category], int]:
         """Retrieve all categories from the database."""
         stmt = (
             self.client.table(TABLE_NAME)
-            .select("*")
+            .select("*", count=CountMethod.exact)
             .limit(limit)
             .offset(offset)
             .order("created_at", desc=is_desc)
@@ -35,7 +37,10 @@ class CategoryRepo(SUPABASE):
             stmt = stmt.lte("created_at", end_date)
 
         resp = stmt.execute()
-        return [Category.model_validate(row) for row in resp.data]
+        return (
+            [Category.model_validate(row) for row in resp.data],
+            resp.count if resp.count else 0,
+        )
 
     def get_category_by_id(self, category_id: str) -> Category | None:
         """Retrieve a specific category by its ID."""
@@ -51,7 +56,9 @@ class CategoryRepo(SUPABASE):
         resp = self.client.table(TABLE_NAME).insert(data).execute()
         return Category.model_validate(resp.data[0])
 
-    def update_category(self, category_id: str, payload: CategoryUpdate) -> Category | None:
+    def update_category(
+        self, category_id: str, payload: CategoryUpdate
+    ) -> Category | None:
         """Update an existing category in the database."""
         update_data = {k: v for k, v in payload.model_dump(exclude_unset=True).items()}
         if not update_data:
