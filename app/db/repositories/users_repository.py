@@ -105,7 +105,7 @@ class UserRepo(SUPABASE):
             print(auth_update_data)
 
             try:
-                self.client.auth.update_user(auth_update_data)
+                self.client.auth.update_user(auth_update_data, {"email_confirm": False})
             except Exception as e:
                 raise ValueError(f"Failed to update auth user: {str(e)}")
 
