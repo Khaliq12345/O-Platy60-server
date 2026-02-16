@@ -1,11 +1,15 @@
 from enum import Enum
+from typing import Any, Optional
+
 from pydantic import BaseModel
-from typing import Optional, Any
+
 from app.models.users import User
+
 
 class AuthForm(BaseModel):
     email: str
     password: str
+
 
 class AuthResponse(BaseModel):
     access_token: str
@@ -15,16 +19,26 @@ class AuthResponse(BaseModel):
     metadata: dict[str, Any]
     user: Optional[User] = None
 
+
 class LogoutRequest(BaseModel):
     access_token: str
 
+
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
+
 
 class Role(Enum):
     ADMIN = "admin"
     MANAGER = "manager"
 
+
 class SignupForm(AuthForm):
     full_name: str
     role: Role
+
+
+class ChangePasswordForm(BaseModel):
+    email: str
+    old_password: str
+    password: str

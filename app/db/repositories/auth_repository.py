@@ -6,10 +6,10 @@ handling login and logout operations with Supabase auth.
 
 from typing import Dict
 
-from app.db.supabase import SUPABASE
-from app.models.auth import AuthForm, AuthResponse, SignupForm
-from app.models.users import UserCreate, User
 from app.db.repositories.users_repository import UserRepo
+from app.db.supabase import SUPABASE
+from app.models.auth import AuthForm, AuthResponse, ChangePasswordForm, SignupForm
+from app.models.users import User, UserCreate
 
 
 class AuthRepo(SUPABASE):
@@ -107,3 +107,18 @@ class AuthRepo(SUPABASE):
             email=response.user.email,
             metadata=response.user.user_metadata,
         )
+
+    def change_password(self, payload: ChangePasswordForm):
+        """Change user password"""
+        response = self.client.auth.sign_in_with_password(
+            {"email": payload.email, "password": payload.old_password}
+        )
+
+        if not response.user or not response.session:
+            raise Exception("Invalid credentials")
+
+        self.client.auth.update_user({"password": payload.password})
+        if not response.user:
+            return None
+
+        return {"message": "Password changed successfully"}
