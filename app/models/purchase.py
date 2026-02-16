@@ -1,10 +1,12 @@
 """Purchase data models."""
 
 from datetime import date, datetime
+from typing import List
+
 from pydantic import BaseModel
+
 from app.models.shared import FilterPayload
 from app.models.transformation import Transformation
-from typing import List
 
 
 class PurchasePayload(FilterPayload):
@@ -28,18 +30,6 @@ class PurchaseCreate(PurchaseBase):
     created_by: str
 
 
-class PurchaseUpdate(BaseModel):
-    # TODO: Need to be checked, all fields cannot be editable for logcal reasons
-    item_name: str | None = None
-    quantity: float | None = None
-    unit: str | None = None
-    price_per_unit: float | None = None
-    total_price: float | None = None
-    purchase_date: date | None = None
-    category_id: str | None = None
-    notes: str | None = None
-
-
 class Purchase(PurchaseBase):
     id: str
     created_by: str
@@ -49,9 +39,3 @@ class Purchase(PurchaseBase):
 
     class Config:
         from_attributes = True
-
-
-class PurchaseSummary(Purchase):
-    total_received_quantity: float
-    total_used_quantity: float
-    remaining_quantity: float

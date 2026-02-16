@@ -1,29 +1,39 @@
 from typing import List
-from app.models.category import Category, CategoryCreate, CategoryUpdate, CategoryPayload
-from app.db.repositories.category_repository import CategoryRepo
+
+from typing_extensions import Dict
+
 from app.core.exception import DatabaseError, ItemNotFoundError
+from app.db.repositories.category_repository import CategoryRepo
+from app.models.category import (
+    Category,
+    CategoryCreate,
+    CategoryPayload,
+    CategoryUpdate,
+)
 
 
 class CategoryService:
     def __init__(self) -> None:
         self.repo = CategoryRepo()
 
-    def get_categories(self, payload: CategoryPayload) -> List[Category]:
+    def get_categories(
+        self, payload: CategoryPayload
+    ) -> Dict[str, List[Category] | int]:
         """Get all categories with filters"""
         try:
             start_date = payload.start_date.isoformat() if payload.start_date else None
             end_date = payload.end_date.isoformat() if payload.end_date else None
             is_desc = payload.order.value == "desc"
             offset = (payload.page - 1) * payload.limit
-            
-            categories = self.repo.list_categories(
+
+            categories, count = self.repo.list_categories(
                 limit=payload.limit,
                 offset=offset,
                 is_desc=is_desc,
                 start_date=start_date,
                 end_date=end_date,
             )
-            return categories
+            return {"categories": categories, "count": count}
         except Exception as e:
             raise DatabaseError("get_categories", str(e))
 

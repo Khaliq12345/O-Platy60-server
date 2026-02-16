@@ -7,14 +7,13 @@ handling all CRUD operations with the Supabase database.
 from typing import List, Tuple
 
 from postgrest import CountMethod
+
 from app.db.supabase import SUPABASE
-from app.services.serialization import serialize_for_supabase
 from app.models.purchase import (
     Purchase,
     PurchaseCreate,
-    PurchaseUpdate,
 )
-
+from app.services.serialization import serialize_for_supabase
 
 # Database table name for purchases
 TABLE_NAME: str = "purchases"
@@ -97,34 +96,6 @@ class PurchaseRepo(SUPABASE):
         data = serialize_for_supabase(payload.model_dump())
         resp = self.client.table(TABLE_NAME).insert(data).execute()
         return Purchase.model_validate(resp.data[0])
-
-    def update_purchase(
-        self, purchase_id: str, payload: PurchaseUpdate
-    ) -> Purchase | None:
-        """Update an existing purchase in the database.
-
-        Args:
-            purchase_id: Unique identifier of the purchase to update
-            payload: Purchase update data (only non-None fields will be updated)
-
-        Returns:
-            Purchase | None: The updated purchase record, or None if no changes
-        """
-        update_data = {k: v for k, v in payload.model_dump(exclude_unset=True).items()}
-        if not update_data:
-            return self.get_purchase_by_id(purchase_id)
-
-        update_data = serialize_for_supabase(update_data)
-        resp = (
-            self.client.table(TABLE_NAME)
-            .update(update_data)
-            .eq("id", purchase_id)
-            .execute()
-        )
-        data = resp.data
-        if data:
-            return Purchase.model_validate(data[0])
-        return None
 
     def delete_purchase(self, purchase_id: str) -> None:
         """Delete a purchase from the database.
