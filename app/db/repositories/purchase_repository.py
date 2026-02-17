@@ -33,6 +33,7 @@ class PurchaseRepo(SUPABASE):
         is_desc: bool = True,
         start_date: str | None = None,
         end_date: str | None = None,
+        ingredient: str | None = None,
     ) -> Tuple[List[Purchase], int]:
         """Retrieve all purchases from the database.
 
@@ -46,6 +47,8 @@ class PurchaseRepo(SUPABASE):
             .offset(offset)
             .order("created_at", desc=is_desc)
         )
+        if ingredient:
+            stmt = stmt.eq("item_name", ingredient)
         if search:
             stmt = stmt.ilike("item_name", f"%{search}%")
         if category_id:

@@ -32,6 +32,7 @@ class PurchaseService:
                 ),
                 category_id=payload.category_id,
                 created_by=payload.created_by,
+                ingredient=payload.ingredient
             )
             return {"purchases": purchases, "count": count}
         except Exception as e:

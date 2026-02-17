@@ -12,6 +12,7 @@ from app.models.transformation import Transformation
 class PurchasePayload(FilterPayload):
     category_id: str | None = None
     created_by: str | None = None
+    ingredient: str | None = None
 
 
 class PurchaseBase(BaseModel):
