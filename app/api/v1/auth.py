@@ -3,7 +3,7 @@
 from typing import Dict
 from fastapi import APIRouter, HTTPException, status
 
-from app.models.auth import AuthForm, AuthResponse, LogoutRequest, RefreshTokenRequest, SignupForm 
+from app.models.auth import AuthForm, AuthResponse, LogoutRequest, RefreshTokenRequest, ChangePasswordForm, SignupForm
 from app.api.deps import auth_service_depends
 from app.core.exception import DatabaseError
 
@@ -50,5 +50,16 @@ def refresh(request: RefreshTokenRequest, auth_service: auth_service_depends):
     except DatabaseError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e)
+        )
+
+@router.post("/change-password")
+def change_password(request: ChangePasswordForm, auth_service: auth_service_depends):
+    """Change user password"""
+    try:
+        return auth_service.change_password(request)
+    except DatabaseError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )

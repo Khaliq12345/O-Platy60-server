@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from app.models.auth import AuthForm, AuthResponse, SignupForm
+from app.models.auth import AuthForm, AuthResponse, SignupForm, ChangePasswordForm
 from app.db.repositories.auth_repository import AuthRepo
 from app.core.exception import DatabaseError
 
@@ -39,3 +39,9 @@ class AuthService:
             return self.repo.refresh_session(refresh_token)
         except Exception as e:
             raise DatabaseError("refresh_session", str(e))
+    
+    def change_password(self, payload: ChangePasswordForm):
+        """Change user password"""
+        response = self.repo.change_password(payload)
+        if not response:
+            raise DatabaseError("change_password", "Failed to change password")

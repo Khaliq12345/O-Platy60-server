@@ -38,7 +38,7 @@ class UserService:
     def update_user(self, user_id: str, payload: UserUpdate) -> User:
         """Update an existing user"""
         try:
-            user = self.repo.update_user(user_id, payload)
+            user = self.repo.update_user(user_id, payload.full_name)
             if not user:
                 raise ItemNotFoundError("update_user", user_id)
             return user

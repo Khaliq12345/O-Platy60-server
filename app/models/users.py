@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from enum import Enum
+
 from pydantic import BaseModel, EmailStr
 
 
@@ -22,12 +23,8 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(BaseModel):
-    email: EmailStr | None = None
     full_name: str | None = None
     role: UserRole | None = None
-    new_password: str | None = None
-    current_email: str  # Email de la session connectée
-    password: str       # Mot de passe pour réauthentifier
 
 
 class User(UserBase):

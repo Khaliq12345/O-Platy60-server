@@ -77,59 +77,21 @@ class UserRepo(SUPABASE):
         resp = self.client.table(TABLE_NAME).insert(data).execute()
         return User.model_validate(resp.data[0])
 
-    def update_user(self, user_id: str, payload: UserUpdate) -> Optional[dict]:
-        """Update user in both auth.users and public table."""
-
-        # 1. Réauthentifier l'utilisateur avec ses credentials actuels
-        # Nécessaire car update_user() nécessite une sess
-        # ion fraîche
-
-        auth_response = self.client.auth.sign_in_with_password(
-            {
-                "email": payload.current_email,
-                "password": payload.password,
-            }
+    def update_user(self, user_id: str, full_name: str = None) -> Optional[dict]:
+        """Update user full_name in auth.users metadata and public table."""
+        
+        if full_name is None:
+            return None
+        
+        # Update public table
+        resp = (
+            self.client.table(TABLE_NAME)
+            .update({"full_name": full_name})
+            .eq("id", user_id)
+            .execute()
         )
 
-        if not auth_response.user or not auth_response.session:
-            raise Exception("Invalid credentials")
-
-        # 2. Mettre à jour auth.users (email, password, etc.)
-        auth_update_data = {}
-        if payload.email:
-            auth_update_data["email"] = payload.email
-        if payload.new_password:
-            auth_update_data["password"] = payload.new_password
-
-        if auth_update_data:
-            print(auth_update_data)
-
-            try:
-                self.client.auth.update_user(auth_update_data, {"email_confirm": False})
-            except Exception as e:
-                raise ValueError(f"Failed to update auth user: {str(e)}")
-
-        # 3. Mettre à jour la table publique (full_name, role, etc.)
-        table_update_data = {}
-        if payload.full_name is not None:
-            table_update_data["full_name"] = payload.full_name
-        if payload.role is not None:
-            table_update_data["role"] = payload.role
-        if payload.email is not None:
-            table_update_data["email"] = payload.email  # Garder synchro
-
-        updated_user = None
-        if table_update_data:
-            resp = (
-                self.client.table(TABLE_NAME)
-                .update(table_update_data)
-                .eq("id", user_id)
-                .execute()
-            )
-            if resp.data:
-                updated_user = resp.data[0]
-
-        return updated_user
+        return resp.data[0] if resp.data else None
 
     def delete_user(self, user_id: str) -> None:
         """Delete a user from the database.
@@ -141,4 +103,5 @@ class UserRepo(SUPABASE):
             This operation will fail if there are purchases created by this user
             due to foreign key constraints.
         """
-        self.client.table(TABLE_NAME).delete().eq("id", user_id).execute()
+        self.client.auth.admin.delete_user(user_id)
+        self.client.table(TABLE_NAME).update({"is_deleted": True}).eq("id", user_id).execute()
