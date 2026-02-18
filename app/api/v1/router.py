@@ -12,6 +12,7 @@ from app.api.v1 import (
     inventory,
     purchases,
     transformations,
+    ingredients,
     transformations_steps,
     users,
 )
@@ -29,4 +30,5 @@ api_router.include_router(transformations.router, dependencies=[Depends(check_lo
 api_router.include_router(
     transformations_steps.router, dependencies=[Depends(check_login)]
 )
+api_router.include_router(ingredients.router, dependencies=[Depends(check_login)])
 api_router.include_router(users.router)

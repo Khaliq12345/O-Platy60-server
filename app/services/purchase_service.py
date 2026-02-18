@@ -32,7 +32,7 @@ class PurchaseService:
                 ),
                 category_id=payload.category_id,
                 created_by=payload.created_by,
-                ingredient=payload.ingredient
+                ingredient=payload.ingredient,
             )
             return {"purchases": purchases, "count": count}
         except Exception as e:
@@ -71,28 +71,3 @@ class PurchaseService:
             self.repo.delete_purchase(purchase_id)
         except Exception as e:
             raise DatabaseError("delete_purchase", str(e))
-
-    def purchase_summary(self, purchase_id: str) -> Purchase:
-        try:
-            # Get the purchase
-            purchase = self.get_purchase(purchase_id)
-
-            # Get all transformations for this purchase
-            transformations = self.transformation_repo.list_transformations(
-                purchase_id=purchase_id
-            )
-
-            # Calculate totals from transformations
-            total_received_quantity = sum(t.quantity_received for t in transformations)
-            total_used_quantity = sum(t.quantity_usable for t in transformations)
-            remaining_quantity = purchase.quantity - total_received_quantity
-
-            # Create summary with calculated values
-            return Purchase(
-                **purchase.model_dump(),
-                total_received_quantity=total_received_quantity,
-                total_used_quantity=total_used_quantity,
-                remaining_quantity=remaining_quantity,
-            )
-        except Exception as e:
-            raise DatabaseError("purchase_summary", str(e))
