@@ -10,6 +10,7 @@ from app.api.v1 import (
     auth,
     categories,
     inventory,
+    products,
     purchases,
     transformations,
     ingredients,
@@ -31,4 +32,5 @@ api_router.include_router(
     transformations_steps.router, dependencies=[Depends(check_login)]
 )
 api_router.include_router(ingredients.router, dependencies=[Depends(check_login)])
+api_router.include_router(products.router, dependencies=[Depends(check_login)])
 api_router.include_router(users.router)
