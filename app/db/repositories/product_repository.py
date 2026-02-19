@@ -4,7 +4,14 @@ from typing import List, Tuple
 from uuid import UUID
 from postgrest import CountMethod
 from app.db.supabase import SUPABASE
-from app.models.product import Product, ProductCreate, ProductUpdate
+from app.models.product import (
+    Product,
+    ProductCreate,
+    ProductTransaction,
+    ProductTransactionPayload,
+    ProductTransactionResponse,
+    ProductUpdate,
+)
 from app.services.serialization import serialize_for_supabase
 
 TABLE_NAME: str = "products"
@@ -74,3 +81,29 @@ class ProductRepo(SUPABASE):
 
     def delete_product(self, product_id: str) -> None:
         self.client.table(TABLE_NAME).delete().eq("product_id", product_id).execute()
+
+    def calculate_product_transaction_summary(
+        self, payload: ProductTransactionPayload
+    ) -> ProductTransactionResponse:
+        """Using start and end date we calculate the summary of all product transactions and group them by dates"""
+        stmt = (
+            self.client.rpc(
+                "get_product_transactions_summary",
+                {
+                    "p_start_date": payload.start_date,
+                    "p_end_date": payload.end_date,
+                },
+                count=CountMethod.exact,
+            )
+            .limit(payload.limit)
+            .offset(payload.offset)
+        )
+        if payload.name:
+            stmt = stmt.ilike("name", f"%{payload.name}%")
+
+        response = stmt.execute()
+        # Parse the output
+        return ProductTransactionResponse(
+            summaries=[ProductTransaction.model_validate(row) for row in response.data],
+            count=response.count,
+        )

@@ -3,7 +3,14 @@
 from typing import Dict, List
 from fastapi import APIRouter, Query, status
 from app.api.deps import product_service_depends
-from app.models.product import Product, ProductCreate, ProductUpdate, ProductPayload
+from app.models.product import (
+    Product,
+    ProductCreate,
+    ProductTransactionPayload,
+    ProductTransactionResponse,
+    ProductUpdate,
+    ProductPayload,
+)
 
 router: APIRouter = APIRouter(prefix="/v1/products", tags=["products"])
 
@@ -46,3 +53,11 @@ def delete_product_endpoint(
 ) -> None:
     """Delete a product."""
     product_service.delete_product(product_id)
+
+
+@router.post("/transaction/summary")
+def delete_product_transaction_summary(
+    product_service: product_service_depends, payload: ProductTransactionPayload
+) -> Dict:
+    """Get product transaction summary"""
+    return product_service.get_product_transaction_summary(payload)

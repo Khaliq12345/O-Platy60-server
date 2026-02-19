@@ -1,7 +1,7 @@
 """Product models."""
 
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -45,3 +45,29 @@ class ProductPayload(BaseModel):
     name: str | None = None
     category: UUID | None = None
     ingredient_id: UUID | None = None
+
+
+# PRODUCT TRANSACTION
+class ProductTransaction(BaseModel):
+    product_name: str
+    day: str
+    initial_portion: float
+    entry: float
+    final_portion: float
+    sale: float
+    remaining: float
+
+
+class ProductTransactionResponse(BaseModel):
+    summaries: List[ProductTransaction]
+    count: int
+
+
+class ProductTransactionPayload(BaseModel):
+    """Query parameters for listing products summary"""
+
+    start_date: str
+    end_date: str
+    limit: int = 10
+    offset: int = 0
+    name: str | None = None

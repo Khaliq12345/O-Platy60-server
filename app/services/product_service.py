@@ -1,7 +1,15 @@
 """Product service for business logic."""
 
+from collections import defaultdict
 from typing import Dict, List
-from app.models.product import Product, ProductPayload, ProductCreate, ProductUpdate
+from app.models.product import (
+    Product,
+    ProductPayload,
+    ProductCreate,
+    ProductTransactionPayload,
+    ProductTransactionResponse,
+    ProductUpdate,
+)
 from app.db.repositories.product_repository import ProductRepo
 from app.core.exception import DatabaseError, ItemNotFoundError
 
@@ -64,3 +72,24 @@ class ProductService:
             raise
         except Exception as e:
             raise DatabaseError("delete_product", str(e))
+
+    def get_product_transaction_summary(
+        self, payload: ProductTransactionPayload
+    ) -> Dict:
+        """Calculate transaction summary of all products in the range selected"""
+        try:
+            response = self.repo.calculate_product_transaction_summary(payload)
+            grouped = defaultdict(list)
+
+            # Iterate through the summaries list
+            for item in response.summaries:
+                name = item.product_name
+                grouped[name].append(item)
+
+            # Convert back to a standard dict for the final output
+            return dict(grouped)
+
+        except (DatabaseError, ItemNotFoundError):
+            raise
+        except Exception as e:
+            raise DatabaseError("get_product_transaction_summary", str(e))
