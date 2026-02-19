@@ -10,6 +10,7 @@ class TransformationStepPayload(FilterPayload):
 
 
 class TransformationStepBase(BaseModel):
+    product_id: str
     transformation_id: str
     step_name: str
     portions: int
@@ -33,4 +34,3 @@ class TransformationStep(TransformationStepBase):
 
     class Config:
         from_attributes = True
-

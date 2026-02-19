@@ -1,7 +1,7 @@
 """Transformation step API endpoints."""
 
 from typing import List
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, status, Query
 
 from app.models.transformation_step import (
     TransformationStep,
@@ -10,7 +10,6 @@ from app.models.transformation_step import (
     TransformationStepPayload,
 )
 from app.api.deps import transformation_step_service_depends
-from app.utils.auth import check_login
 
 router: APIRouter = APIRouter(
     prefix="/v1/transformation-steps", tags=["transformation-steps"]
