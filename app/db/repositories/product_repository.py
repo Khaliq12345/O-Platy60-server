@@ -10,6 +10,7 @@ from app.models.product import (
     ProductTransaction,
     ProductTransactionPayload,
     ProductTransactionResponse,
+    ProductTransactionUpdateSales,
     ProductUpdate,
 )
 from app.services.serialization import serialize_for_supabase
@@ -107,3 +108,10 @@ class ProductRepo(SUPABASE):
             summaries=[ProductTransaction.model_validate(row) for row in response.data],
             count=response.count,
         )
+
+    def update_product_transaction_sales(self, payload: ProductTransactionUpdateSales):
+        stmt = self.client.from_("product_transactions").insert(
+            {"sale": payload.sales, "product_id": payload.product_id}
+        )
+        response = stmt.execute()
+        return response

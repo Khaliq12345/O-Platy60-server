@@ -8,6 +8,7 @@ from app.models.product import (
     ProductCreate,
     ProductTransactionPayload,
     ProductTransactionResponse,
+    ProductTransactionUpdateSales,
     ProductUpdate,
     ProductPayload,
 )
@@ -61,3 +62,12 @@ def delete_product_transaction_summary(
 ) -> Dict:
     """Get product transaction summary"""
     return product_service.get_product_transaction_summary(payload)
+
+
+@router.put("/transaction/add")
+def sales_update(
+    product_service: product_service_depends, payload: ProductTransactionUpdateSales
+) -> dict:
+    """Update saled of a product transaction"""
+    product_service.update_product_sales(payload)
+    return {"status": "success", "message": "sales updated"}

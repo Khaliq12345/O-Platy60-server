@@ -7,7 +7,7 @@ from app.models.product import (
     ProductPayload,
     ProductCreate,
     ProductTransactionPayload,
-    ProductTransactionResponse,
+    ProductTransactionUpdateSales,
     ProductUpdate,
 )
 from app.db.repositories.product_repository import ProductRepo
@@ -93,3 +93,13 @@ class ProductService:
             raise
         except Exception as e:
             raise DatabaseError("get_product_transaction_summary", str(e))
+
+    def update_product_sales(self, payload: ProductTransactionUpdateSales):
+        """Update product transaction sales"""
+        try:
+            self.get_product(payload.product_id)
+            self.repo.update_product_transaction_sales(payload)
+        except (DatabaseError, ItemNotFoundError):
+            raise
+        except Exception as e:
+            raise DatabaseError("update_product_sales", str(e))

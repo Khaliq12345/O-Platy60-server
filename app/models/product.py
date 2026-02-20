@@ -71,3 +71,8 @@ class ProductTransactionPayload(BaseModel):
     limit: int = 10
     offset: int = 0
     name: str | None = None
+
+
+class ProductTransactionUpdateSales(BaseModel):
+    product_id: str
+    sales: float
