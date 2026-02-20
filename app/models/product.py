@@ -49,6 +49,7 @@ class ProductPayload(BaseModel):
 
 # PRODUCT TRANSACTION
 class ProductTransaction(BaseModel):
+    product_id: str
     product_name: str
     day: str
     initial_portion: float
